@@ -6,8 +6,8 @@ import javax.script.ScriptException;
 
 public class DefaultScriptRunner implements ScriptRunner {
 
-    public static final String SCRIPT_ENGINE_NAME = "nashorn";
-    public static final String CLOUD_KEY = "cloud";
+    private static final String SCRIPT_ENGINE_NAME = "nashorn";
+    private static final String CLOUD_KEY = "cloud";
     private final ScriptEngine engine;
 
     public DefaultScriptRunner(ScriptCloudGateway scriptCloudGateway) {
