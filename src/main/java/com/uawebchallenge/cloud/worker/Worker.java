@@ -1,4 +1,4 @@
-package com.uawebchallenge.cloud.network.worker;
+package com.uawebchallenge.cloud.worker;
 
 public class Worker extends Thread {
 

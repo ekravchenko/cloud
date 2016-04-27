@@ -1,4 +1,4 @@
-package com.uawebchallenge.cloud.network.worker;
+package com.uawebchallenge.cloud.worker;
 
 import org.junit.Test;
 
