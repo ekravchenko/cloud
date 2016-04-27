@@ -3,6 +3,7 @@ package com.uawebchallenge.cloud.task.impl;
 import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.store.StoreKeyConstants;
 import com.uawebchallenge.cloud.task.Task;
+import com.uawebchallenge.cloud.task.TaskStatus;
 import com.uawebchallenge.cloud.task.exception.LockException;
 import com.uawebchallenge.cloud.task.exception.TaskException;
 
@@ -24,6 +25,24 @@ class TasksList {
         Set<Task> tasks = tasks();
         this.tasksListLock.lock();
         tasks.add(task);
+        this.store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
+        this.tasksListLock.unlock();
+    }
+
+    Optional<Task> get(String taskId) throws TaskException {
+        Set<Task> tasks = tasks();
+        return tasks.stream().filter(t -> t.getId().equals(taskId)).findFirst();
+    }
+
+    void update(String taskId, TaskStatus taskStatus, Object taskResult) throws TaskException {
+        Set<Task> tasks = tasks();
+        this.tasksListLock.lock();
+        Optional<Task> taskOptional = tasks.stream().filter(t -> t.getId().equals(taskId)).findFirst();
+        if (taskOptional.isPresent()) {
+            Task task = taskOptional.get();
+            task.setTaskStatus(taskStatus);
+            task.setResult(taskResult);
+        }
         this.store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
         this.tasksListLock.unlock();
     }

@@ -6,13 +6,15 @@ import java.util.Optional;
 
 public interface TaskManager {
 
-    Optional<Task> nextPendingTask();
+    Optional<Task> nextPendingTask() throws TaskException;
 
-    Task getTask(String taskId);
+    Optional<Task> getTask(String taskId) throws TaskException;
 
-    void startTask(String taskId);
+    void startTask(String taskId) throws TaskException;
 
-    void finishTask(String taskId, Object result);
+    void scheduleTask(String taskId) throws TaskException;
+
+    void finishTask(String taskId, Object result) throws TaskException;
 
     String addTask(Optional<Object> input, String script) throws TaskException;
 }

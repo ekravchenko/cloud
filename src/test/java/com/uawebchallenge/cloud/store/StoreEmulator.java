@@ -8,10 +8,11 @@ import java.util.Optional;
 
 public class StoreEmulator implements Store {
 
-    HashMap<Object, Object> map = new HashMap<Object, Object>();
+    HashMap<Object, Object> map = new HashMap<>();
 
     public void put(Object key, Object value) {
-        map.put(key, value);
+        Object clone = SerializationUtils.clone((Serializable) value);
+        map.put(key, clone);
     }
 
     public Optional<Object> get(Object key) {
