@@ -6,8 +6,7 @@ import lombok.ToString;
 import org.apache.commons.lang3.Validate;
 
 import java.io.Serializable;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @EqualsAndHashCode
@@ -19,6 +18,7 @@ public class Task implements Serializable {
     private String script;
     private TaskStatus taskStatus;
     private Object result;
+    private List<String> dependsOn;
 
     public Task(Optional<Object> inputOptional, String script) {
         Validate.notNull(inputOptional, "Provided 'inputOptional' is null");
@@ -28,6 +28,7 @@ public class Task implements Serializable {
         this.input = inputOptional.isPresent() ? inputOptional.get() : null;
         this.script = script;
         this.taskStatus = TaskStatus.NOT_STARTED;
+        this.dependsOn = new LinkedList<>();
     }
 
     public void setTaskStatus(TaskStatus taskStatus) {
@@ -36,5 +37,9 @@ public class Task implements Serializable {
 
     public void setResult(Object result) {
         this.result = result;
+    }
+
+    public void setDependsOn(String... taskIds) {
+        this.dependsOn = new LinkedList<>(Arrays.asList(taskIds));
     }
 }

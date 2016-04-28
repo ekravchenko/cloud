@@ -8,6 +8,8 @@ public interface TaskManager {
 
     Optional<Task> nextPendingTask() throws TaskException;
 
+    boolean dependenciesResolved(Task task) throws TaskException;
+
     Optional<Task> getTask(String taskId) throws TaskException;
 
     void startTask(String taskId) throws TaskException;

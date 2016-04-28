@@ -1,11 +1,10 @@
 package com.uawebchallenge.cloud.task.impl;
 
+import com.uawebchallenge.cloud.exception.TaskException;
 import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.store.StoreKeyConstants;
 import com.uawebchallenge.cloud.task.Task;
 import com.uawebchallenge.cloud.task.TaskStatus;
-import com.uawebchallenge.cloud.exception.LockException;
-import com.uawebchallenge.cloud.exception.TaskException;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -48,9 +47,13 @@ class TasksList {
     }
 
     @SuppressWarnings("unchecked")
-    Set<Task> tasks() throws LockException {
-        this.tasksListLock.waitForUnlock();
-        Optional<Object> taskListOptional = this.store.get(StoreKeyConstants.TASK_LIST_KEY);
-        return taskListOptional.isPresent() ? (Set<Task>) taskListOptional.get() : new HashSet<>();
+    Set<Task> tasks() throws TaskException {
+        try {
+            this.tasksListLock.waitForUnlock();
+            Optional<Object> taskListOptional = this.store.get(StoreKeyConstants.TASK_LIST_KEY);
+            return taskListOptional.isPresent() ? (Set<Task>) taskListOptional.get() : new HashSet<>();
+        } catch (LockException e) {
+            throw new TaskException("Problem with lock on tasks list. Cause: " + e.getMessage());
+        }
     }
 }

@@ -1,5 +1,7 @@
 package com.uawebchallenge.cloud.worker;
 
+import com.uawebchallenge.cloud.exception.ScriptException;
+import com.uawebchallenge.cloud.exception.TaskException;
 import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.task.Task;
 import com.uawebchallenge.cloud.task.TaskManager;
@@ -33,24 +35,42 @@ public class Worker {
         while (!stop) {
             try {
                 Optional<Task> taskOptional = taskManager.nextPendingTask();
-                if (taskOptional.isPresent()) {
-                    Task task = taskOptional.get();
-                    Object result = taskRunner.run(task);
-                    taskManager.finishTask(task.getId(), result);
-                    workerSleep.reset();
-                } else {
-                    sleepQuietly(workerSleep.getSleep());
-                    workerSleep.increase();
-                }
+                executeTask(taskOptional);
             } catch (Exception e) {
                 logger.error(e.getMessage());
             }
         }
     }
 
-    private void sleepQuietly(long millis) {
+    private void executeTask(Optional<Task> taskOptional) throws TaskException {
+        if (!taskOptional.isPresent()) {
+            logger.debug("No pending task was found. Worker is currently idle.");
+            sleepQuietly();
+            workerSleep.increase();
+        } else if (!taskManager.dependenciesResolved(taskOptional.get())) {
+            logger.debug(String.format("Task '%s' has dependencies that were not resolved yet. Skipping this task..."));
+            sleepQuietly();
+            workerSleep.increase();
+        } else {
+            try {
+                Task task = taskOptional.get();
+                logger.info(String.format("Executing task '%s'.", task.getId()));
+                taskManager.startTask(task.getId());
+                Object result = taskRunner.run(task);
+                logger.info("Task '%s' .");
+                taskManager.finishTask(task.getId(), result);
+                workerSleep.reset();
+            } catch (ScriptException e) {
+
+            }
+        }
+    }
+
+    private void sleepQuietly() {
         try {
-            Thread.sleep(millis);
+            logger.trace(String.format("I'll wait for %d milliseconds.", workerSleep.getSleep()));
+            Thread.sleep(workerSleep.getSleep());
+            workerSleep.increase();
         } catch (InterruptedException e) {
             logger.error("Unexpected InterruptedException when freezing thread.", e);
         }

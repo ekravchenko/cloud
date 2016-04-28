@@ -1,12 +1,12 @@
-package com.uawebchallenge.cloud.exception;
+package com.uawebchallenge.cloud.task.impl;
 
-public class LockException extends TaskException {
+class LockException extends Exception {
 
     protected LockException(String message) {
         super(message);
     }
 
-    public static LockException lockTimeout(long timeoutMillis) {
+    static LockException lockTimeout(long timeoutMillis) {
         return new LockException(String.format("Lock timeout. Tasks list was locked for %d millis", timeoutMillis));
     }
 }

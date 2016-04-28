@@ -1,10 +1,10 @@
 package com.uawebchallenge.cloud.task.impl;
 
+import com.uawebchallenge.cloud.exception.TaskException;
 import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.task.Task;
 import com.uawebchallenge.cloud.task.TaskManager;
 import com.uawebchallenge.cloud.task.TaskStatus;
-import com.uawebchallenge.cloud.exception.TaskException;
 
 import java.util.Optional;
 
@@ -40,5 +40,10 @@ public class DefaultTaskManager implements TaskManager {
         Task task = new Task(input, script);
         tasksList.add(task);
         return task.getId();
+    }
+
+    @Override
+    public boolean dependenciesResolved(Task task) throws TaskException {
+        return false;
     }
 }
