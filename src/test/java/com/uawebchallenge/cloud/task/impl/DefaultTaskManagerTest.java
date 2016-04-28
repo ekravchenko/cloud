@@ -133,6 +133,30 @@ public class DefaultTaskManagerTest {
     }
 
     @Test
+    public void error() throws TaskException {
+        final Task task1 = new Task(Optional.empty(), "foo() {}", Optional.empty());
+
+        Set<Task> tasks = new HashSet<>();
+        tasks.add(task1);
+
+        store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
+
+        String error = "Something wrong with your script";
+        taskManager.failTask(task1.getId(), error);
+
+        Optional<Object> tasksOptional = store.get(StoreKeyConstants.TASK_LIST_KEY);
+        assertNotNull(tasksOptional);
+        assertTrue(tasksOptional.isPresent());
+
+        tasks = (Set<Task>) tasksOptional.get();
+        assertEquals(1, tasks.size());
+
+        Task updatedTask = tasks.iterator().next();
+        assertEquals(TaskStatus.ERROR, updatedTask.getTaskStatus());
+        assertEquals(error, updatedTask.getError());
+    }
+
+    @Test
     public void add() throws TaskException {
         taskManager.addTask(Optional.empty(), "foo() {}", Optional.empty());
 

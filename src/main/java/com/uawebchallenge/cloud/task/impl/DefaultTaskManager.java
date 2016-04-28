@@ -45,7 +45,7 @@ public class DefaultTaskManager implements TaskManager {
 
     public void failTask(String taskId, String error) throws TaskException {
         UpdatableTaskData taskData = UpdatableTaskData.builder()
-                .taskStatus(TaskStatus.FINISHED)
+                .taskStatus(TaskStatus.ERROR)
                 .error(error)
                 .build();
         tasksList.update(taskId, taskData);
