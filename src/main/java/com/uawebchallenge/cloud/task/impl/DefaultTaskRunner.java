@@ -1,5 +1,7 @@
 package com.uawebchallenge.cloud.task.impl;
 
+import com.uawebchallenge.cloud.exception.ScriptException;
+import com.uawebchallenge.cloud.exception.TaskException;
 import com.uawebchallenge.cloud.script.DefaultScriptRunner;
 import com.uawebchallenge.cloud.script.ScriptCloudGateway;
 import com.uawebchallenge.cloud.script.ScriptRunner;
@@ -7,10 +9,8 @@ import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.task.Task;
 import com.uawebchallenge.cloud.task.TaskRunner;
 
-import javax.script.ScriptException;
 
 public class DefaultTaskRunner implements TaskRunner {
-
 
     private final ScriptRunner scriptRunner;
 
@@ -20,7 +20,11 @@ public class DefaultTaskRunner implements TaskRunner {
     }
 
     @Override
-    public Object run(Task task) throws ScriptException {
-        return scriptRunner.run(task.getScript());
+    public Object run(Task task) throws TaskException {
+        try {
+            return scriptRunner.run(task.getScript(), task.getInput());
+        } catch (ScriptException e) {
+            throw new TaskException(e.getMessage());
+        }
     }
 }

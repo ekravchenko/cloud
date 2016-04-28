@@ -1,13 +1,14 @@
 package com.uawebchallenge.cloud.script;
 
+import com.uawebchallenge.cloud.exception.ScriptException;
 import com.uawebchallenge.cloud.exception.TaskException;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import javax.script.ScriptException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 
 public class DefaultScriptRunnerTest {
@@ -16,16 +17,35 @@ public class DefaultScriptRunnerTest {
 
     @Test
     public void runWithCloudGateway() throws ScriptException, TaskException {
-        String script = "var task={input: 5, script: 'function(input) {return input + 1;}'};" +
-                "cloud.createTask(task);";
+        String script = "function main() {var task={input: 5, script: 'function main(input) {return input + 1;}'};" +
+                "cloud.createTask(task);}";
 
         ScriptRunner scriptRunner = new DefaultScriptRunner(mockCloudGateway);
         scriptRunner.run(script);
 
         Map<String, Object> expectedValues = new HashMap<>();
         expectedValues.put("input", 5);
-        expectedValues.put("script", "function(input) {return input + 1;}");
+        expectedValues.put("script", "function main(input) {return input + 1;}");
         verify(mockCloudGateway).createTask(ScriptObjectMirrorMatcher.matchesValues(expectedValues));
     }
 
+    @Test
+    public void run() throws ScriptException {
+        String script = "function main() {return 2+5;}";
+
+        ScriptRunner scriptRunner = new DefaultScriptRunner(mockCloudGateway);
+        Object result = scriptRunner.run(script);
+
+        assertEquals(7, result);
+    }
+
+    @Test
+    public void runWithArgs() throws ScriptException {
+        String script = "function main(input) {return input+5;}";
+
+        ScriptRunner scriptRunner = new DefaultScriptRunner(mockCloudGateway);
+        Object result = scriptRunner.run(script, 2);
+
+        assertEquals(7, result);
+    }
 }
