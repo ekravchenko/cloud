@@ -13,9 +13,9 @@ import java.util.Optional;
 
 public class DefaultScriptCloudGateway implements ScriptCloudGateway {
 
-    protected final static String INPUT_KEY = "input";
+    private final static String INPUT_KEY = "input";
     protected final static String SCRIPT_KEY = "script";
-    protected final static String DEPENDS_ON_KEY = "dependsOn";
+    private final static String DEPENDS_ON_KEY = "dependsOn";
 
     private final TasksList tasksList;
 
