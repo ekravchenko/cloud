@@ -1,7 +1,7 @@
 package com.uawebchallenge.cloud.task.impl;
 
 import com.uawebchallenge.cloud.exception.TaskException;
-import com.uawebchallenge.cloud.script.ScriptCloudGateway;
+import com.uawebchallenge.cloud.script.CloudBinding;
 import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.task.Task;
 import jdk.nashorn.api.scripting.ScriptUtils;
@@ -11,7 +11,7 @@ import javax.script.Bindings;
 import java.util.Arrays;
 import java.util.Optional;
 
-public class DefaultScriptCloudGateway implements ScriptCloudGateway {
+public class DefaultCloudBinding implements CloudBinding {
 
     private final static String INPUT_KEY = "input";
     protected final static String SCRIPT_KEY = "script";
@@ -20,7 +20,7 @@ public class DefaultScriptCloudGateway implements ScriptCloudGateway {
 
     private final TasksList tasksList;
 
-    public DefaultScriptCloudGateway(Store store) {
+    public DefaultCloudBinding(Store store) {
         tasksList = new TasksList(store);
     }
 

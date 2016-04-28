@@ -15,11 +15,11 @@ public class DefaultScriptRunner implements ScriptRunner {
     private static final String METHOD_NAME = "main";
     private final ScriptEngine engine;
 
-    public DefaultScriptRunner(ScriptCloudGateway scriptCloudGateway) {
+    public DefaultScriptRunner(CloudBinding cloudBinding) {
         LoggerBinding loggerBinding = new DefaultLoggerBinding(LoggerFactory.getLogger("script"));
         ScriptEngineManager engineManager = new ScriptEngineManager();
         engine = engineManager.getEngineByName(SCRIPT_ENGINE_NAME);
-        engine.put(CLOUD_KEY, scriptCloudGateway);
+        engine.put(CLOUD_KEY, cloudBinding);
         engine.put(LOGGER_KEY, loggerBinding);
     }
 

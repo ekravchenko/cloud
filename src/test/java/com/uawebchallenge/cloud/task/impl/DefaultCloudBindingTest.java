@@ -1,12 +1,11 @@
 package com.uawebchallenge.cloud.task.impl;
 
 import com.uawebchallenge.cloud.exception.TaskException;
-import com.uawebchallenge.cloud.script.ScriptCloudGateway;
+import com.uawebchallenge.cloud.script.CloudBinding;
 import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.store.StoreEmulator;
 import com.uawebchallenge.cloud.store.StoreKeyConstants;
 import com.uawebchallenge.cloud.task.Task;
-import jdk.nashorn.internal.objects.NativeArray;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -16,16 +15,16 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
-public class DefaultScriptCloudGatewayTest {
+public class DefaultCloudBindingTest {
 
     private final Store store = new StoreEmulator();
-    private final ScriptCloudGateway cloudGateway = new DefaultScriptCloudGateway(store);
+    private final CloudBinding cloudGateway = new DefaultCloudBinding(store);
 
     @SuppressWarnings("unchecked")
     @Test
     public void createTask() throws TaskException {
         Bindings jsObject = Mockito.mock(Bindings.class);
-        Mockito.when(jsObject.get(DefaultScriptCloudGateway.SCRIPT_KEY)).thenReturn("function() {return null;}");
+        Mockito.when(jsObject.get(DefaultCloudBinding.SCRIPT_KEY)).thenReturn("function() {return null;}");
         cloudGateway.createTask(jsObject);
 
         Optional<Object> tasksOptional = store.get(StoreKeyConstants.TASK_LIST_KEY);

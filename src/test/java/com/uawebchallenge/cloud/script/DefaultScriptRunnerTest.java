@@ -14,7 +14,7 @@ import static org.mockito.Mockito.verify;
 
 public class DefaultScriptRunnerTest {
 
-    private final ScriptCloudGateway mockCloudGateway = Mockito.mock(ScriptCloudGateway.class);
+    private final CloudBinding mockCloudGateway = Mockito.mock(CloudBinding.class);
 
     @Test
     public void runWithCloudGateway() throws ScriptException, TaskException {
