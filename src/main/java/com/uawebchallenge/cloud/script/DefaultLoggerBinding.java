@@ -2,11 +2,11 @@ package com.uawebchallenge.cloud.script;
 
 import org.slf4j.Logger;
 
-public class DefaultLoggerGateway implements LoggerGateway {
+public class DefaultLoggerBinding implements LoggerBinding {
 
     private final Logger logger;
 
-    public DefaultLoggerGateway(Logger logger) {
+    public DefaultLoggerBinding(Logger logger) {
         this.logger = logger;
     }
 

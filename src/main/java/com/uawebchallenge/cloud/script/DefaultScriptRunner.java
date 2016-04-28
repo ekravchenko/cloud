@@ -16,11 +16,11 @@ public class DefaultScriptRunner implements ScriptRunner {
     private final ScriptEngine engine;
 
     public DefaultScriptRunner(ScriptCloudGateway scriptCloudGateway) {
-        LoggerGateway loggerGateway = new DefaultLoggerGateway(LoggerFactory.getLogger("script"));
+        LoggerBinding loggerBinding = new DefaultLoggerBinding(LoggerFactory.getLogger("script"));
         ScriptEngineManager engineManager = new ScriptEngineManager();
         engine = engineManager.getEngineByName(SCRIPT_ENGINE_NAME);
         engine.put(CLOUD_KEY, scriptCloudGateway);
-        engine.put(LOGGER_KEY, loggerGateway);
+        engine.put(LOGGER_KEY, loggerBinding);
     }
 
     public Object run(String script, Object... args) throws ScriptException {

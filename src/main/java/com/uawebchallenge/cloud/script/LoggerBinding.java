@@ -1,6 +1,6 @@
 package com.uawebchallenge.cloud.script;
 
-public interface LoggerGateway {
+public interface LoggerBinding {
 
     void info(String message, Object... data);
 
