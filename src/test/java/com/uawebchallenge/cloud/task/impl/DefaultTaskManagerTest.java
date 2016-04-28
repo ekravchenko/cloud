@@ -170,4 +170,88 @@ public class DefaultTaskManagerTest {
         Task updatedTask = tasks.iterator().next();
         assertEquals(TaskStatus.NOT_STARTED, updatedTask.getTaskStatus());
     }
+
+    @Test
+    public void dependenciesResolvedWhenAllCool() throws TaskException {
+        final Task task1 = new Task(Optional.empty(), "foo() {}", Optional.empty());
+        task1.setTaskStatus(TaskStatus.FINISHED);
+
+        final Task task2 = new Task(Optional.empty(), "bar() {}", Optional.empty());
+        task2.setTaskStatus(TaskStatus.FINISHED);
+
+        final Task task3 = new Task(Optional.empty(), "hi() {}", Optional.empty());
+        task3.setTaskStatus(TaskStatus.FINISHED);
+
+        final Task task4 = new Task(Optional.empty(), "yo() {}",
+                Optional.of(new String[]{task1.getId(), task2.getId(), task3.getId()}));
+
+        Set<Task> tasks = new HashSet<>();
+        tasks.add(task1);
+        tasks.add(task2);
+        tasks.add(task3);
+        tasks.add(task4);
+
+        store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
+
+        assertTrue(taskManager.dependenciesResolved(task4));
+    }
+
+    @Test
+    public void dependenciesResolvedWhenOneTaskNotStarted() throws TaskException {
+        final Task task1 = new Task(Optional.empty(), "foo() {}", Optional.empty());
+        task1.setTaskStatus(TaskStatus.FINISHED);
+
+        final Task task2 = new Task(Optional.empty(), "bar() {}", Optional.empty());
+        task2.setTaskStatus(TaskStatus.FINISHED);
+
+        final Task task3 = new Task(Optional.empty(), "hi() {}", Optional.empty());
+        task3.setTaskStatus(TaskStatus.NOT_STARTED);
+
+        final Task task4 = new Task(Optional.empty(), "yo() {}",
+                Optional.of(new String[]{task1.getId(), task2.getId(), task3.getId()}));
+
+        Set<Task> tasks = new HashSet<>();
+        tasks.add(task1);
+        tasks.add(task2);
+        tasks.add(task3);
+        tasks.add(task4);
+
+        store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
+
+        assertFalse(taskManager.dependenciesResolved(task4));
+    }
+
+    @Test
+    public void dependenciesResolvedWhenOneTaskHasError() throws TaskException {
+        final Task task1 = new Task(Optional.empty(), "foo() {}", Optional.empty());
+        task1.setTaskStatus(TaskStatus.FINISHED);
+
+        final Task task2 = new Task(Optional.empty(), "bar() {}", Optional.empty());
+        task2.setTaskStatus(TaskStatus.FINISHED);
+
+        final Task task3 = new Task(Optional.empty(), "hi() {}", Optional.empty());
+        task3.setTaskStatus(TaskStatus.ERROR);
+        task3.setError("Something went wrong");
+
+        final Task task4 = new Task(Optional.empty(), "yo() {}",
+                Optional.of(new String[]{task1.getId(), task2.getId(), task3.getId()}));
+
+        Set<Task> tasks = new HashSet<>();
+        tasks.add(task1);
+        tasks.add(task2);
+        tasks.add(task3);
+        tasks.add(task4);
+
+        store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
+
+        assertFalse(taskManager.dependenciesResolved(task4));
+
+        Optional<Task> updatedTaskOptional = taskManager.getTask(task4.getId());
+        assertNotNull(updatedTaskOptional);
+        assertTrue(updatedTaskOptional.isPresent());
+
+        Task updatedTask = updatedTaskOptional.get();
+        assertEquals(TaskStatus.ERROR, updatedTask.getTaskStatus());
+        assertEquals("Something went wrong", updatedTask.getError());
+    }
 }

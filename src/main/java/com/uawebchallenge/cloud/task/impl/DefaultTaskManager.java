@@ -7,6 +7,7 @@ import com.uawebchallenge.cloud.task.TaskManager;
 import com.uawebchallenge.cloud.task.TaskStatus;
 
 import java.util.Optional;
+import java.util.Set;
 
 public class DefaultTaskManager implements TaskManager {
 
@@ -59,6 +60,25 @@ public class DefaultTaskManager implements TaskManager {
 
     @Override
     public boolean dependenciesResolved(Task task) throws TaskException {
-        return false;
+        Set<Task> tasks = tasksList.tasks();
+        for (String dependantTaskId : task.getDependsOn()) {
+            Optional<Task> dependantTaskOptional = tasks.stream()
+                    .filter(t -> t.getId().equals(dependantTaskId))
+                    .findFirst();
+            if (!dependantTaskOptional.isPresent()) {
+                final String error = String.format("Task depends on task '%s' which couldn't be found.", dependantTaskId);
+                failTask(task.getId(), error);
+                return false;
+            }
+            Task dependantTask = dependantTaskOptional.get();
+
+            if (dependantTask.getTaskStatus() == TaskStatus.ERROR) {
+                failTask(task.getId(), dependantTask.getError());
+                return false;
+            } else if (dependantTask.getTaskStatus() != TaskStatus.FINISHED) {
+                return false;
+            }
+        }
+        return true;
     }
 }
