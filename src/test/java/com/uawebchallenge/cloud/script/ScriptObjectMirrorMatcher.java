@@ -5,6 +5,7 @@ import org.hamcrest.Description;
 import org.mockito.ArgumentMatcher;
 
 import java.util.Map;
+import java.util.Objects;
 
 import static org.mockito.Matchers.argThat;
 
@@ -31,8 +32,10 @@ class ScriptObjectMirrorMatcher extends ArgumentMatcher<ScriptObjectMirror> {
         for (Object key : expectedValues.keySet()) {
             //noinspection SuspiciousMethodCalls
             Object actualValue = scriptObjectMirror.get(key);
+            String actualValueString = Objects.toString(actualValue);
             Object expectedValue = expectedValues.get(key);
-            if (!expectedValue.equals(actualValue)) {
+            String expectedValueString = Objects.toString(expectedValue);
+            if (!expectedValueString.equals(actualValueString)) {
                 return false;
             }
         }

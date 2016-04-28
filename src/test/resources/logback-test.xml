@@ -13,7 +13,7 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="script" level="debug" additivity="false">
+    <logger name="script" level="trace" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 

@@ -18,7 +18,7 @@ public class DefaultScriptRunnerTest {
 
     @Test
     public void runWithCloudGateway() throws ScriptException, TaskException {
-        String script = "function main() {var task={input: 5, script: 'function main(input) {return input + 1;}'};" +
+        String script = "function main() {var task={input: 5, script: function main(input) {return input + 1;}};" +
                 "cloud.createTask(task);}";
 
         ScriptRunner scriptRunner = new DefaultScriptRunner(mockCloudGateway);

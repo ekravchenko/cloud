@@ -30,8 +30,8 @@ public class DefaultScriptRunner implements ScriptRunner {
             return inv.invokeFunction(METHOD_NAME, args);
         } catch (NoSuchMethodException e) {
             throw ScriptException.methodNotFound();
-        } catch (javax.script.ScriptException e) {
-            throw ScriptException.scriptError(e.getMessage());
+        } catch (Exception e) {
+            throw ScriptException.scriptError(e.getMessage(),script);
         }
     }
 }

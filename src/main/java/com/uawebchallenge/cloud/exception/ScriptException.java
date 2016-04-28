@@ -6,8 +6,8 @@ public class ScriptException extends Exception {
         super(message);
     }
 
-    public static ScriptException scriptError(String error) {
-        return new ScriptException("Script has an error. " + error);
+    public static ScriptException scriptError(String error, String script) {
+        return new ScriptException("Script has an error. " + error + "\r\n" + script);
     }
 
     public static ScriptException methodNotFound() {

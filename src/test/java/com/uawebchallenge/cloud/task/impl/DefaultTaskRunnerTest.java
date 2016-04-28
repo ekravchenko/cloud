@@ -38,7 +38,7 @@ public class DefaultTaskRunnerTest {
     @Test
     public void testRunWithTaskCreation() throws ScriptException, TaskException {
         final String script = "function main(context) { " +
-                "var task={input:[5,7], script: 'function main(input) {return input + 4;}', dependsOn: ['2', '3']};" +
+                "var task={input:[5,7], script: function main(input) {return input + 4;}, dependsOn: ['2', '3']};" +
                 "print('Context:');" +
                 "print('Input='+context.input);" +
                 "print('TaskId='+context.taskId);" +
@@ -68,7 +68,7 @@ public class DefaultTaskRunnerTest {
     @Test
     public void testRunWithTaskCreationSimpleInput() throws ScriptException, TaskException {
         final String script = "function main(context) { " +
-                "var task={input:'arrayAddress', script: 'function main(input) {return input + 4;}', dependsOn: ['2', '3']};" +
+                "var task={input:'arrayAddress', script: function main(input) {return input + 4;}, dependsOn: ['2', '3']};" +
                 "cloud.createTask(task);}";
         Task task = new Task(Optional.empty(), script, Optional.of(new String[]{"5", "6"}), Optional.of("9"));
         Object result = taskRunner.run(task);
