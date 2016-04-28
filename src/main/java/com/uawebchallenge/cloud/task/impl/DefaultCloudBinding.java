@@ -19,9 +19,11 @@ public class DefaultCloudBinding implements CloudBinding {
     private final static String PARENT_ID_KEY = "parentId";
 
     private final TasksList tasksList;
+    private final Store store;
 
     public DefaultCloudBinding(Store store) {
-        tasksList = new TasksList(store);
+        this.store = store;
+        this.tasksList = new TasksList(store);
     }
 
     @Override
@@ -35,6 +37,17 @@ public class DefaultCloudBinding implements CloudBinding {
         Task task = new Task(Optional.ofNullable(input), script, Optional.ofNullable(dependsOn), Optional.ofNullable(parentId));
         tasksList.add(task);
         return task.getId();
+    }
+
+    @Override
+    public void put(Object key, Object value) {
+        this.store.put(key, value);
+    }
+
+    @Override
+    public Object get(Object key) {
+        Optional<Object> optional = this.store.get(key);
+        return optional.isPresent() ? optional.get() : null;
     }
 
     private String[] getDependsOn(Object dependsOnWrapper) {

@@ -7,4 +7,8 @@ import javax.script.Bindings;
 public interface CloudBinding {
 
     String createTask(Bindings object) throws TaskException;
+
+    void put(Object key, Object value);
+
+    Object get(Object key);
 }

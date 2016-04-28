@@ -10,17 +10,22 @@ import javax.script.ScriptEngineManager;
 public class DefaultScriptRunner implements ScriptRunner {
 
     private static final String SCRIPT_ENGINE_NAME = "nashorn";
+    private static final String LIBRARY_KEY = "library";
     private static final String CLOUD_KEY = "cloud";
     private static final String LOGGER_KEY = "log";
     private static final String METHOD_NAME = "main";
     private final ScriptEngine engine;
 
     public DefaultScriptRunner(CloudBinding cloudBinding) {
-        LoggerBinding loggerBinding = new DefaultLoggerBinding(LoggerFactory.getLogger("script"));
         ScriptEngineManager engineManager = new ScriptEngineManager();
         engine = engineManager.getEngineByName(SCRIPT_ENGINE_NAME);
+
+        LoggerBinding loggerBinding = new DefaultLoggerBinding(LoggerFactory.getLogger("script"));
+        LibraryBinding libraryBinding = new DefaultLibraryBinding(engine, cloudBinding);
+
         engine.put(CLOUD_KEY, cloudBinding);
         engine.put(LOGGER_KEY, loggerBinding);
+        engine.put(LIBRARY_KEY, libraryBinding);
     }
 
     public Object run(String script, Object... args) throws ScriptException {
@@ -31,7 +36,7 @@ public class DefaultScriptRunner implements ScriptRunner {
         } catch (NoSuchMethodException e) {
             throw ScriptException.methodNotFound();
         } catch (Exception e) {
-            throw ScriptException.scriptError(e.getMessage(),script);
+            throw ScriptException.scriptError(e.getMessage(), script);
         }
     }
 }

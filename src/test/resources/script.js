@@ -1,9 +1,13 @@
-var arrayToSort = ["true", "goal", "working", "trouble", "awesome", "fun", "dangerous", "understand", "mine"];
+function arrayToSort() {
+    return ["true", "goal", "working", "trouble", "awesome", "fun", "dangerous", "understand", "mine"];
+}
 
 function divideIntoBuckets(context) {
-    log.trace("Slicing array=[" + arrayToSort + "]");
+    library.require("arrayToSort");
+
+    log.trace("Slicing array=[" + arrayToSort() + "]");
     var bucketSize = 4;
-    var buckets = arrayToSort.length / bucketSize;
+    var buckets = arrayToSort().length / bucketSize;
     log.trace("buckets=" + buckets);
 
     for (var i = 0; i < buckets; i++) {
@@ -13,14 +17,8 @@ function divideIntoBuckets(context) {
         var task = {
             input: [startIndex, endIndex],
             script: function main(context) {
-                var arrayToSort = ["true", "goal", "working", "trouble", "awesome", "fun", "dangerous", "understand", "mine"];
-                var startIndex = context.input[0];
-                var endIndex = context.input[1];
-                log.trace("Creating sliced buckets");
-                log.trace("startIndex=" + startIndex);
-                log.trace("endIndex=" + endIndex);
-                var result = arrayToSort.slice(startIndex, endIndex);
-                log.trace("result=[" + result + "]");
+                library.require("slice");
+                slice(context);
             },
             parentId: null,
             dependsOn: null
@@ -30,12 +28,27 @@ function divideIntoBuckets(context) {
     }
 }
 
-function main(context) {
+function slice(context) {
+    library.require("arrayToSort");
 
+    var startIndex = context.input[0];
+    var endIndex = context.input[1];
+    log.trace("Creating sliced buckets");
+    log.trace("startIndex=" + startIndex);
+    log.trace("endIndex=" + endIndex);
+    var result = arrayToSort().slice(startIndex, endIndex);
+    log.trace("result=[" + result + "]");
+}
+
+function main(context) {
+    library.export("arrayToSort", arrayToSort);
+    library.export("divideIntoBuckets", divideIntoBuckets);
+    library.export("slice", slice);
 
     var task = {
         input: null,
         script: function main(context) {
+            library.require("divideIntoBuckets");
             return divideIntoBuckets(context);
         },
         parentId: context.taskId,
