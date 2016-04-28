@@ -1,4 +1,4 @@
-package com.uawebchallenge.cloud.task.exception;
+package com.uawebchallenge.cloud.exception;
 
 public class TaskException extends Exception {
 

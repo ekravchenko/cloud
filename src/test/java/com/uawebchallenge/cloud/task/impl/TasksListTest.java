@@ -5,7 +5,7 @@ import com.uawebchallenge.cloud.store.StoreEmulator;
 import com.uawebchallenge.cloud.store.StoreKeyConstants;
 import com.uawebchallenge.cloud.task.Task;
 import com.uawebchallenge.cloud.task.TaskStatus;
-import com.uawebchallenge.cloud.task.exception.TaskException;
+import com.uawebchallenge.cloud.exception.TaskException;
 import org.junit.Test;
 
 import java.util.HashSet;

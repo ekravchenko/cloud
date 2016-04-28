@@ -4,8 +4,8 @@ import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.store.StoreKeyConstants;
 import com.uawebchallenge.cloud.task.Task;
 import com.uawebchallenge.cloud.task.TaskStatus;
-import com.uawebchallenge.cloud.task.exception.LockException;
-import com.uawebchallenge.cloud.task.exception.TaskException;
+import com.uawebchallenge.cloud.exception.LockException;
+import com.uawebchallenge.cloud.exception.TaskException;
 
 import java.util.HashSet;
 import java.util.Optional;

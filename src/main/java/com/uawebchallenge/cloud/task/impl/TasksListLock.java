@@ -2,7 +2,7 @@ package com.uawebchallenge.cloud.task.impl;
 
 import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.store.StoreKeyConstants;
-import com.uawebchallenge.cloud.task.exception.LockException;
+import com.uawebchallenge.cloud.exception.LockException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -4,7 +4,7 @@ import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.task.Task;
 import com.uawebchallenge.cloud.task.TaskManager;
 import com.uawebchallenge.cloud.task.TaskRunner;
-import com.uawebchallenge.cloud.task.exception.TaskException;
+import com.uawebchallenge.cloud.exception.TaskException;
 import com.uawebchallenge.cloud.task.impl.DefaultTaskManager;
 import com.uawebchallenge.cloud.task.impl.DefaultTaskRunner;
 import org.slf4j.Logger;
