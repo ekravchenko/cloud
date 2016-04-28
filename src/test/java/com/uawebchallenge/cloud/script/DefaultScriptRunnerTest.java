@@ -2,6 +2,7 @@ package com.uawebchallenge.cloud.script;
 
 import com.uawebchallenge.cloud.exception.ScriptException;
 import com.uawebchallenge.cloud.exception.TaskException;
+import jdk.nashorn.api.scripting.ScriptUtils;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -26,6 +27,7 @@ public class DefaultScriptRunnerTest {
         Map<String, Object> expectedValues = new HashMap<>();
         expectedValues.put("input", 5);
         expectedValues.put("script", "function main(input) {return input + 1;}");
+
         verify(mockCloudGateway).createTask(ScriptObjectMirrorMatcher.matchesValues(expectedValues));
     }
 

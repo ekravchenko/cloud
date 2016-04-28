@@ -5,5 +5,6 @@ public enum TaskStatus {
     NOT_SCHEDULED,
     NOT_STARTED,
     IN_PROGRESS,
-    FINISHED
+    FINISHED,
+    ERROR,
 }

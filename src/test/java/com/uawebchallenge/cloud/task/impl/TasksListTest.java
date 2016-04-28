@@ -1,11 +1,11 @@
 package com.uawebchallenge.cloud.task.impl;
 
+import com.uawebchallenge.cloud.exception.TaskException;
 import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.store.StoreEmulator;
 import com.uawebchallenge.cloud.store.StoreKeyConstants;
 import com.uawebchallenge.cloud.task.Task;
 import com.uawebchallenge.cloud.task.TaskStatus;
-import com.uawebchallenge.cloud.exception.TaskException;
 import org.junit.Test;
 
 import java.util.HashSet;
@@ -21,7 +21,7 @@ public class TasksListTest {
 
     @Test
     public void testGetWhenTaskExists() throws TaskException {
-        final Task task = new Task(Optional.empty(), "foo() {}");
+        final Task task = new Task(Optional.empty(), "foo() {}", Optional.empty());
         Set<Task> tasks = new HashSet<>();
         tasks.add(task);
         store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
@@ -41,7 +41,7 @@ public class TasksListTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testAdd() throws TaskException {
-        final Task task = new Task(Optional.empty(), "foo() {}");
+        final Task task = new Task(Optional.empty(), "foo() {}", Optional.empty());
         tasksList.add(task);
 
         Optional<Object> tasksOptional = store.get(StoreKeyConstants.TASK_LIST_KEY);
@@ -55,12 +55,13 @@ public class TasksListTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testUpdate() throws TaskException {
-        final Task task = new Task(Optional.empty(), "foo() {}");
+        final Task task = new Task(Optional.empty(), "foo() {}", Optional.empty());
         Set<Task> tasks = new HashSet<>();
         tasks.add(task);
         store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
 
-        tasksList.update(task.getId(), TaskStatus.FINISHED, 10);
+        UpdatableTaskData taskData = UpdatableTaskData.builder().taskStatus(TaskStatus.FINISHED).result(10).build();
+        tasksList.update(task.getId(), taskData);
 
         Optional<Object> tasksOptional = store.get(StoreKeyConstants.TASK_LIST_KEY);
         assertNotNull(tasksOptional);

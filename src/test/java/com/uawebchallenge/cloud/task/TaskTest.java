@@ -10,7 +10,7 @@ public class TaskTest {
 
     @Test
     public void createObject() {
-        Task task = new Task(Optional.empty(), "function() {return 'Hello world';}");
+        Task task = new Task(Optional.empty(), "function() {return 'Hello world';}", Optional.empty());
         assertNotNull(task.getId());
         assertNull(task.getInput());
         assertEquals("function() {return 'Hello world';}", task.getScript());

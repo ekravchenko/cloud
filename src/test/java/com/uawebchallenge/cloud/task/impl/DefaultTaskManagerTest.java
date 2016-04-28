@@ -23,16 +23,16 @@ public class DefaultTaskManagerTest {
 
     @Test
     public void getNextPendingTask() throws TaskException {
-        final Task task1 = new Task(Optional.empty(), "foo() {}");
+        final Task task1 = new Task(Optional.empty(), "foo() {}", Optional.empty());
         task1.setTaskStatus(TaskStatus.NOT_SCHEDULED);
 
-        final Task task2 = new Task(Optional.empty(), "bar() {}");
+        final Task task2 = new Task(Optional.empty(), "bar() {}", Optional.empty());
         task2.setTaskStatus(TaskStatus.IN_PROGRESS);
 
-        final Task task3 = new Task(Optional.empty(), "hi() {}");
+        final Task task3 = new Task(Optional.empty(), "hi() {}", Optional.empty());
         task3.setTaskStatus(TaskStatus.FINISHED);
 
-        final Task task4 = new Task(Optional.empty(), "yo() {}");
+        final Task task4 = new Task(Optional.empty(), "yo() {}", Optional.empty());
 
         Set<Task> tasks = new HashSet<>();
         tasks.add(task1);
@@ -50,7 +50,7 @@ public class DefaultTaskManagerTest {
 
     @Test
     public void getTask() throws TaskException {
-        final Task task1 = new Task(Optional.empty(), "foo() {}");
+        final Task task1 = new Task(Optional.empty(), "foo() {}", Optional.empty());
         task1.setTaskStatus(TaskStatus.NOT_SCHEDULED);
 
         Set<Task> tasks = new HashSet<>();
@@ -65,7 +65,7 @@ public class DefaultTaskManagerTest {
 
     @Test
     public void schedule() throws TaskException {
-        final Task task1 = new Task(Optional.empty(), "foo() {}");
+        final Task task1 = new Task(Optional.empty(), "foo() {}", Optional.empty());
         task1.setTaskStatus(TaskStatus.NOT_SCHEDULED);
 
         Set<Task> tasks = new HashSet<>();
@@ -88,7 +88,7 @@ public class DefaultTaskManagerTest {
 
     @Test
     public void start() throws TaskException {
-        final Task task1 = new Task(Optional.empty(), "foo() {}");
+        final Task task1 = new Task(Optional.empty(), "foo() {}", Optional.empty());
 
         Set<Task> tasks = new HashSet<>();
         tasks.add(task1);
@@ -110,7 +110,7 @@ public class DefaultTaskManagerTest {
 
     @Test
     public void finish() throws TaskException {
-        final Task task1 = new Task(Optional.empty(), "foo() {}");
+        final Task task1 = new Task(Optional.empty(), "foo() {}", Optional.empty());
 
         Set<Task> tasks = new HashSet<>();
         tasks.add(task1);
@@ -134,7 +134,7 @@ public class DefaultTaskManagerTest {
 
     @Test
     public void add() throws TaskException {
-        taskManager.addTask(Optional.empty(), "foo() {}");
+        taskManager.addTask(Optional.empty(), "foo() {}", Optional.empty());
 
         Optional<Object> tasksOptional = store.get(StoreKeyConstants.TASK_LIST_KEY);
         assertNotNull(tasksOptional);

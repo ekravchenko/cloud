@@ -4,7 +4,6 @@ import com.uawebchallenge.cloud.exception.TaskException;
 import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.store.StoreKeyConstants;
 import com.uawebchallenge.cloud.task.Task;
-import com.uawebchallenge.cloud.task.TaskStatus;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -33,18 +32,20 @@ class TasksList {
         return tasks.stream().filter(t -> t.getId().equals(taskId)).findFirst();
     }
 
-    void update(String taskId, TaskStatus taskStatus, Object taskResult) throws TaskException {
+    void update(String taskId, UpdatableTaskData updatableTaskData) throws TaskException {
         Set<Task> tasks = tasks();
         this.tasksListLock.lock();
         Optional<Task> taskOptional = tasks.stream().filter(t -> t.getId().equals(taskId)).findFirst();
         if (taskOptional.isPresent()) {
             Task task = taskOptional.get();
-            task.setTaskStatus(taskStatus);
-            task.setResult(taskResult);
+            task.setTaskStatus(updatableTaskData.getTaskStatus());
+            task.setResult(updatableTaskData.getResult());
+            task.setError(updatableTaskData.getError());
         }
         this.store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
         this.tasksListLock.unlock();
     }
+
 
     @SuppressWarnings("unchecked")
     Set<Task> tasks() throws TaskException {

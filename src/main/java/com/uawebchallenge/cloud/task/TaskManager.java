@@ -18,5 +18,7 @@ public interface TaskManager {
 
     void finishTask(String taskId, Object result) throws TaskException;
 
-    String addTask(Optional<Object> input, String script) throws TaskException;
+    void failTask(String taskId, String error) throws TaskException;
+
+    String addTask(Optional<Object> input, String script, Optional<String[]> dependsOn) throws TaskException;
 }

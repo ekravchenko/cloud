@@ -6,6 +6,7 @@ import com.uawebchallenge.cloud.task.Task;
 import com.uawebchallenge.cloud.task.TaskManager;
 import com.uawebchallenge.cloud.task.TaskStatus;
 
+import java.util.List;
 import java.util.Optional;
 
 public class DefaultTaskManager implements TaskManager {
@@ -25,19 +26,34 @@ public class DefaultTaskManager implements TaskManager {
     }
 
     public void startTask(String taskId) throws TaskException {
-        tasksList.update(taskId, TaskStatus.IN_PROGRESS, null);
+        UpdatableTaskData taskData = UpdatableTaskData.builder().taskStatus(TaskStatus.IN_PROGRESS).build();
+        tasksList.update(taskId, taskData);
     }
 
     public void scheduleTask(String taskId) throws TaskException {
-        tasksList.update(taskId, TaskStatus.NOT_STARTED, null);
+        UpdatableTaskData taskData = UpdatableTaskData.builder().taskStatus(TaskStatus.NOT_STARTED).build();
+        tasksList.update(taskId, taskData);
     }
 
     public void finishTask(String taskId, Object result) throws TaskException {
-        tasksList.update(taskId, TaskStatus.FINISHED, result);
+        UpdatableTaskData taskData = UpdatableTaskData.builder()
+                .taskStatus(TaskStatus.FINISHED)
+                .result(result)
+                .build();
+        tasksList.update(taskId, taskData);
     }
 
-    public String addTask(Optional<Object> input, String script) throws TaskException {
-        Task task = new Task(input, script);
+    public void failTask(String taskId, String error) throws TaskException {
+        UpdatableTaskData taskData = UpdatableTaskData.builder()
+                .taskStatus(TaskStatus.FINISHED)
+                .error(error)
+                .build();
+        tasksList.update(taskId, taskData);
+    }
+
+
+    public String addTask(Optional<Object> input, String script, Optional<String[]> dependsOn) throws TaskException {
+        Task task = new Task(input, script, dependsOn);
         tasksList.add(task);
         return task.getId();
     }
