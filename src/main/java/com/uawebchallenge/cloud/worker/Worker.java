@@ -56,10 +56,10 @@ public class Worker {
             Task task = taskOptional.get();
             String taskId = task.getId();
             try {
-                logger.info(String.format("Executing task '%s'.", taskId));
                 taskManager.startTask(taskId);
+                logger.info(String.format("Executing task '%s'.", taskId));
                 Object result = taskRunner.run(task);
-                logger.info("Task '%s' .");
+                logger.info(String.format("Task '%s' finished executing. Result=%s", taskId, result));
                 taskManager.finishTask(taskId, result);
                 workerSleep.reset();
             } catch (ScriptException e) {

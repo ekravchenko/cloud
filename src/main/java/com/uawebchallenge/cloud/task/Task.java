@@ -10,7 +10,7 @@ import java.util.*;
 
 @Getter
 @EqualsAndHashCode
-@ToString
+@ToString(exclude = "script")
 public class Task implements Serializable {
 
     private String id;

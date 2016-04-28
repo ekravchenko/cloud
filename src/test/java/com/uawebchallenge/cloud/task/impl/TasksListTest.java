@@ -73,4 +73,29 @@ public class TasksListTest {
         Task updatedTask = tasks.iterator().next();
         assertNotNull(updatedTask.getResult());
     }
+
+    @Test(expected = TaskException.class)
+    public void testUpdateTwice() throws TaskException {
+        final Task task = new Task("foo() {}");
+        Set<Task> tasks = new HashSet<>();
+        tasks.add(task);
+        store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
+
+        UpdatableTaskData taskData = UpdatableTaskData.builder().taskStatus(TaskStatus.IN_PROGRESS).build();
+        tasksList.update(task.getId(), taskData);
+        tasksList.update(task.getId(), taskData);
+        fail("Updating twice leads to problems");
+    }
+
+    @Test(expected = TaskException.class)
+    public void testUpdateUnknownTask() throws TaskException {
+        final Task task = new Task("foo() {}");
+        Set<Task> tasks = new HashSet<>();
+        tasks.add(task);
+        store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
+
+        UpdatableTaskData taskData = UpdatableTaskData.builder().taskStatus(TaskStatus.IN_PROGRESS).build();
+        tasksList.update("RandomId", taskData);
+        fail("Updating twice leads to problems");
+    }
 }

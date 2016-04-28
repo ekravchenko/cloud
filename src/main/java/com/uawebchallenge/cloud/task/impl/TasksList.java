@@ -6,6 +6,7 @@ import com.uawebchallenge.cloud.store.StoreKeyConstants;
 import com.uawebchallenge.cloud.task.Task;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -22,9 +23,12 @@ class TasksList {
     void add(Task task) throws TaskException {
         Set<Task> tasks = tasks();
         this.tasksListLock.lock();
-        tasks.add(task);
-        this.store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
-        this.tasksListLock.unlock();
+        try {
+            tasks.add(task);
+            this.store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
+        } finally {
+            this.tasksListLock.unlock();
+        }
     }
 
     Optional<Task> get(String taskId) throws TaskException {
@@ -35,15 +39,27 @@ class TasksList {
     void update(String taskId, UpdatableTaskData updatableTaskData) throws TaskException {
         Set<Task> tasks = tasks();
         this.tasksListLock.lock();
-        Optional<Task> taskOptional = tasks.stream().filter(t -> t.getId().equals(taskId)).findFirst();
-        if (taskOptional.isPresent()) {
+        try {
+            Optional<Task> taskOptional = tasks.stream().filter(t -> t.getId().equals(taskId)).findFirst();
+            if (!taskOptional.isPresent()) {
+                throw TaskException.taskNotFound(taskId);
+            }
             Task task = taskOptional.get();
+
+            if (task.getTaskStatus() == updatableTaskData.getTaskStatus() &&
+                    Objects.equals(task.getResult(), updatableTaskData.getResult()) &&
+                    Objects.equals(task.getError(), updatableTaskData.getError())) {
+                throw TaskException.taskAlreadyUpdated(task.toString(), updatableTaskData.toString());
+            }
+
             task.setTaskStatus(updatableTaskData.getTaskStatus());
             task.setResult(updatableTaskData.getResult());
             task.setError(updatableTaskData.getError());
+
+            this.store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
+        } finally {
+            this.tasksListLock.unlock();
         }
-        this.store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
-        this.tasksListLock.unlock();
     }
 
 
