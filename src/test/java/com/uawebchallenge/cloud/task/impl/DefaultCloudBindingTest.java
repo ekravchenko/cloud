@@ -1,5 +1,6 @@
 package com.uawebchallenge.cloud.task.impl;
 
+import com.uawebchallenge.cloud.exception.ScriptException;
 import com.uawebchallenge.cloud.exception.TaskException;
 import com.uawebchallenge.cloud.script.CloudBinding;
 import com.uawebchallenge.cloud.store.Store;
@@ -22,7 +23,7 @@ public class DefaultCloudBindingTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void createTask() throws TaskException {
+    public void createTask() throws TaskException, ScriptException {
         Bindings jsObject = Mockito.mock(Bindings.class);
         Mockito.when(jsObject.get(DefaultCloudBinding.SCRIPT_KEY)).thenReturn("function() {return null;}");
         cloudGateway.createTask(jsObject);

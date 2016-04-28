@@ -10,6 +10,8 @@ function divideIntoBuckets(context) {
     var buckets = arrayToSort().length / bucketSize;
     log.trace("buckets=" + buckets);
 
+    var tasks = [];
+
     for (var i = 0; i < buckets; i++) {
         var startIndex = i * bucketSize;
         var endIndex = startIndex + bucketSize;
@@ -18,14 +20,26 @@ function divideIntoBuckets(context) {
             input: [startIndex, endIndex],
             script: function main(context) {
                 library.require("slice");
-                slice(context);
+                return slice(context);
             },
             parentId: null,
             dependsOn: null
         };
 
         var taskId = cloud.createTask(task);
+        tasks[i] = taskId;
     }
+
+    var resultTask = {
+        input: tasks,
+        script: function main(context) {
+            log.info("!!!!!!!!!!!!!!!!!!!!!!!!!");
+        },
+        dependsOn: tasks,
+        parentId: context.taskId
+    };
+
+    cloud.createTask(resultTask);
 }
 
 function slice(context) {
@@ -36,8 +50,11 @@ function slice(context) {
     log.trace("Creating sliced buckets");
     log.trace("startIndex=" + startIndex);
     log.trace("endIndex=" + endIndex);
+
     var result = arrayToSort().slice(startIndex, endIndex);
     log.trace("result=[" + result + "]");
+
+    return result;
 }
 
 function main(context) {

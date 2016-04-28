@@ -9,7 +9,6 @@ import javax.script.ScriptEngineManager;
 
 public class DefaultScriptRunner implements ScriptRunner {
 
-    private static final String SCRIPT_ENGINE_NAME = "nashorn";
     private static final String LIBRARY_KEY = "library";
     private static final String CLOUD_KEY = "cloud";
     private static final String LOGGER_KEY = "log";
@@ -34,7 +33,7 @@ public class DefaultScriptRunner implements ScriptRunner {
             engine.eval(script);
             return inv.invokeFunction(METHOD_NAME, args);
         } catch (NoSuchMethodException e) {
-            throw ScriptException.methodNotFound();
+            throw ScriptException.methodNotFound(METHOD_NAME);
         } catch (Exception e) {
             throw ScriptException.scriptError(e.getMessage(), script);
         }

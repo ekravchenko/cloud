@@ -10,7 +10,7 @@ public class ScriptException extends Exception {
         return new ScriptException("Script has an error. " + error + "\r\n" + script);
     }
 
-    public static ScriptException methodNotFound() {
-        return new ScriptException("The JS function that should be executed in task should have name of 'main'.");
+    public static ScriptException methodNotFound(String methodName) {
+        return new ScriptException("The JS function that should be executed in task should have name of " + methodName + ".");
     }
 }
