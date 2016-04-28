@@ -13,4 +13,8 @@ public class ScriptException extends Exception {
     public static ScriptException methodNotFound(String methodName) {
         return new ScriptException("The JS function that should be executed in task should have name of " + methodName + ".");
     }
+
+    public static ScriptException libraryNotExported(String library) {
+        return new ScriptException(String.format("Library '%s' was not exported.", library));
+    }
 }

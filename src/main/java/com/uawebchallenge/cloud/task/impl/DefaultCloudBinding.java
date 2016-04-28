@@ -39,7 +39,8 @@ public class DefaultCloudBinding implements CloudBinding {
     }
 
     @Override
-    public void put(Object key, Object value) {
+    public void put(Object key, Object jsValue) throws ScriptException {
+        Object value = ScriptUtils.unwrapObject(jsValue);
         this.store.put(key, value);
     }
 

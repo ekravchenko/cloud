@@ -56,6 +56,9 @@ class TasksList {
             task.setResult(updatableTaskData.getResult());
             task.setError(updatableTaskData.getError());
 
+            if (task.getResult() != null) {
+                this.store.put(task.getId(), task.getResult());
+            }
             this.store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
         } finally {
             this.tasksListLock.unlock();

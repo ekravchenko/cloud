@@ -24,7 +24,7 @@ public class WorkerTest {
     private final static Logger logger = LoggerFactory.getLogger(WorkerTest.class);
     private Store store = new StoreEmulator();
 
-    @Test(timeout = 100000)
+    @Test(timeout = 1000000)
     public void run() throws IOException {
         String script = getScript();
 

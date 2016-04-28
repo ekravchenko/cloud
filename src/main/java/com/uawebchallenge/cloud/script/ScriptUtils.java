@@ -2,6 +2,7 @@ package com.uawebchallenge.cloud.script;
 
 import com.uawebchallenge.cloud.exception.ScriptException;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
+import jdk.nashorn.internal.runtime.ScriptObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +37,7 @@ public class ScriptUtils {
         if (wrapper == null) {
             return null;
         }
-        if (!(wrapper instanceof ScriptObjectMirror)) {
+        if (!(wrapper instanceof ScriptObjectMirror) && !(wrapper instanceof ScriptObject)) {
             return wrapper;
         }
         try {

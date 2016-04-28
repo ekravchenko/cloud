@@ -1,6 +1,8 @@
 package com.uawebchallenge.cloud.script;
 
 import com.uawebchallenge.cloud.exception.ScriptException;
+import com.uawebchallenge.cloud.store.Store;
+import com.uawebchallenge.cloud.task.impl.DefaultCloudBinding;
 import org.slf4j.LoggerFactory;
 
 import javax.script.Invocable;
@@ -15,12 +17,13 @@ public class DefaultScriptRunner implements ScriptRunner {
     private static final String METHOD_NAME = "main";
     private final ScriptEngine engine;
 
-    public DefaultScriptRunner(CloudBinding cloudBinding) {
+    public DefaultScriptRunner(Store store) {
         ScriptEngineManager engineManager = new ScriptEngineManager();
         engine = engineManager.getEngineByName(SCRIPT_ENGINE_NAME);
 
         LoggerBinding loggerBinding = new DefaultLoggerBinding(LoggerFactory.getLogger("script"));
-        LibraryBinding libraryBinding = new DefaultLibraryBinding(engine, cloudBinding);
+        CloudBinding cloudBinding = new DefaultCloudBinding(store);
+        LibraryBinding libraryBinding = new DefaultLibraryBinding(engine, store);
 
         engine.put(CLOUD_KEY, cloudBinding);
         engine.put(LOGGER_KEY, loggerBinding);

@@ -2,7 +2,6 @@ package com.uawebchallenge.cloud.task.impl;
 
 import com.uawebchallenge.cloud.exception.ScriptException;
 import com.uawebchallenge.cloud.script.DefaultScriptRunner;
-import com.uawebchallenge.cloud.script.CloudBinding;
 import com.uawebchallenge.cloud.script.ScriptRunner;
 import com.uawebchallenge.cloud.script.ScriptUtils;
 import com.uawebchallenge.cloud.store.Store;
@@ -16,8 +15,7 @@ public class DefaultTaskRunner implements TaskRunner {
     private final ScriptRunner scriptRunner;
 
     public DefaultTaskRunner(Store store) {
-        final CloudBinding cloudGateway = new DefaultCloudBinding(store);
-        this.scriptRunner = new DefaultScriptRunner(cloudGateway);
+        this.scriptRunner = new DefaultScriptRunner(store);
     }
 
     @Override

@@ -9,7 +9,7 @@ public interface CloudBinding {
 
     String createTask(Bindings object) throws TaskException, ScriptException;
 
-    void put(Object key, Object value);
+    void put(Object key, Object value) throws ScriptException;
 
     Object get(Object key);
 }

@@ -6,7 +6,7 @@ import javax.script.Bindings;
 
 public interface LibraryBinding {
 
-    void export(String libraryName, Bindings script);
+    void export(String libraryName, Bindings script) throws ScriptException;
 
     void require(String libraryName) throws ScriptException;
 }
