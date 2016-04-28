@@ -2,7 +2,7 @@ package com.uawebchallenge.cloud.exception;
 
 public class ScriptException extends Exception {
 
-    protected ScriptException(String message) {
+    private ScriptException(String message) {
         super(message);
     }
 

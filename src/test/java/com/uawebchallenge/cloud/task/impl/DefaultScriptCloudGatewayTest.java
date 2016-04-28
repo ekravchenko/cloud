@@ -24,7 +24,9 @@ public class DefaultScriptCloudGatewayTest {
     @Test
     public void createTask() throws TaskException {
         Bindings jsObject = Mockito.mock(Bindings.class);
+        Mockito.when(jsObject.get(DefaultScriptCloudGateway.INPUT_KEY)).thenReturn(5);
         Mockito.when(jsObject.get(DefaultScriptCloudGateway.SCRIPT_KEY)).thenReturn("function() {return null;}");
+        Mockito.when(jsObject.get(DefaultScriptCloudGateway.DEPENDS_ON_KEY)).thenReturn(new String[]{"1", "2", "3"});
         cloudGateway.createTask(jsObject);
 
         Optional<Object> tasksOptional = store.get(StoreKeyConstants.TASK_LIST_KEY);

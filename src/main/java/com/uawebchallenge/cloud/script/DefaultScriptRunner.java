@@ -10,7 +10,7 @@ public class DefaultScriptRunner implements ScriptRunner {
 
     private static final String SCRIPT_ENGINE_NAME = "nashorn";
     private static final String CLOUD_KEY = "cloud";
-    public static final String METHOD_NAME = "main";
+    private static final String METHOD_NAME = "main";
     private final ScriptEngine engine;
 
     public DefaultScriptRunner(ScriptCloudGateway scriptCloudGateway) {

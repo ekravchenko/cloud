@@ -6,7 +6,6 @@ import com.uawebchallenge.cloud.task.Task;
 import com.uawebchallenge.cloud.task.TaskManager;
 import com.uawebchallenge.cloud.task.TaskStatus;
 
-import java.util.List;
 import java.util.Optional;
 
 public class DefaultTaskManager implements TaskManager {

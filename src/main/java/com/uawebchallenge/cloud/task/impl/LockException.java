@@ -2,7 +2,7 @@ package com.uawebchallenge.cloud.task.impl;
 
 class LockException extends Exception {
 
-    protected LockException(String message) {
+    private LockException(String message) {
         super(message);
     }
 

@@ -10,7 +10,7 @@ import java.util.Optional;
 class TasksListLock {
 
     private final static Logger logger = LoggerFactory.getLogger(TasksListLock.class);
-    final static int SLEEP_MILLIS = 100;
+    private final static int SLEEP_MILLIS = 100;
     final static int MAX_TOTAL_SLEEP = 1500;
 
     private final Store store;

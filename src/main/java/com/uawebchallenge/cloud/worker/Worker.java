@@ -48,20 +48,24 @@ public class Worker {
             sleepQuietly();
             workerSleep.increase();
         } else if (!taskManager.dependenciesResolved(taskOptional.get())) {
-            logger.debug(String.format("Task '%s' has dependencies that were not resolved yet. Skipping this task..."));
+            logger.debug(String.format("Task '%s' has dependencies that were not resolved yet. Skipping this task...",
+                    taskOptional.get().getId()));
             sleepQuietly();
             workerSleep.increase();
         } else {
+            Task task = taskOptional.get();
+            String taskId = task.getId();
             try {
-                Task task = taskOptional.get();
-                logger.info(String.format("Executing task '%s'.", task.getId()));
-                taskManager.startTask(task.getId());
+                logger.info(String.format("Executing task '%s'.", taskId));
+                taskManager.startTask(taskId);
                 Object result = taskRunner.run(task);
                 logger.info("Task '%s' .");
-                taskManager.finishTask(task.getId(), result);
+                taskManager.finishTask(taskId, result);
                 workerSleep.reset();
             } catch (ScriptException e) {
-
+                final String error = e.getMessage();
+                logger.warn(String.format("Error running task '%s'. Error: %s", taskId, error));
+                taskManager.failTask(taskId, error);
             }
         }
     }
