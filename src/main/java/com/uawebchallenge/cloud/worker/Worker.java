@@ -4,7 +4,6 @@ import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.task.Task;
 import com.uawebchallenge.cloud.task.TaskManager;
 import com.uawebchallenge.cloud.task.TaskRunner;
-import com.uawebchallenge.cloud.exception.TaskException;
 import com.uawebchallenge.cloud.task.impl.DefaultTaskManager;
 import com.uawebchallenge.cloud.task.impl.DefaultTaskRunner;
 import org.slf4j.Logger;
@@ -22,7 +21,7 @@ public class Worker {
 
     public Worker(Store store) {
         this.taskManager = new DefaultTaskManager(store);
-        this.taskRunner = new DefaultTaskRunner();
+        this.taskRunner = new DefaultTaskRunner(store);
         this.workerSleep = new WorkerSleep();
     }
 
@@ -36,13 +35,14 @@ public class Worker {
                 Optional<Task> taskOptional = taskManager.nextPendingTask();
                 if (taskOptional.isPresent()) {
                     Task task = taskOptional.get();
-                    taskRunner.run(task);
+                    Object result = taskRunner.run(task);
+                    taskManager.finishTask(task.getId(), result);
                     workerSleep.reset();
                 } else {
                     sleepQuietly(workerSleep.getSleep());
                     workerSleep.increase();
                 }
-            } catch (TaskException e) {
+            } catch (Exception e) {
                 logger.error(e.getMessage());
             }
         }

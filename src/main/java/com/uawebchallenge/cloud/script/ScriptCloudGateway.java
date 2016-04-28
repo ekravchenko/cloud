@@ -1,8 +1,10 @@
 package com.uawebchallenge.cloud.script;
 
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
+import com.uawebchallenge.cloud.exception.TaskException;
+
+import javax.script.Bindings;
 
 public interface ScriptCloudGateway {
 
-    void createTask(ScriptObjectMirror object);
+    String createTask(Bindings object) throws TaskException;
 }
