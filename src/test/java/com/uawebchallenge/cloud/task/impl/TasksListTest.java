@@ -21,7 +21,7 @@ public class TasksListTest {
 
     @Test
     public void testGetWhenTaskExists() throws TaskException {
-        final Task task = new Task(Optional.empty(), "foo() {}", Optional.empty());
+        final Task task = new Task("foo() {}");
         Set<Task> tasks = new HashSet<>();
         tasks.add(task);
         store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
@@ -41,7 +41,7 @@ public class TasksListTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testAdd() throws TaskException {
-        final Task task = new Task(Optional.empty(), "foo() {}", Optional.empty());
+        final Task task = new Task("foo() {}");
         tasksList.add(task);
 
         Optional<Object> tasksOptional = store.get(StoreKeyConstants.TASK_LIST_KEY);
@@ -55,7 +55,7 @@ public class TasksListTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testUpdate() throws TaskException {
-        final Task task = new Task(Optional.empty(), "foo() {}", Optional.empty());
+        final Task task = new Task("foo() {}");
         Set<Task> tasks = new HashSet<>();
         tasks.add(task);
         store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);

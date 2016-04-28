@@ -16,6 +16,7 @@ public class DefaultScriptCloudGateway implements ScriptCloudGateway {
     private final static String INPUT_KEY = "input";
     protected final static String SCRIPT_KEY = "script";
     private final static String DEPENDS_ON_KEY = "dependsOn";
+    private final static String PARENT_ID_KEY = "parentId";
 
     private final TasksList tasksList;
 
@@ -25,11 +26,12 @@ public class DefaultScriptCloudGateway implements ScriptCloudGateway {
 
     @Override
     public String createTask(Bindings object) throws TaskException {
-        Object input = object.get(INPUT_KEY);
+        Object input = getInput(object.get(INPUT_KEY));
         String script = (String) object.get(SCRIPT_KEY);
         String[] dependsOn = getDependsOn(object.get(DEPENDS_ON_KEY));
+        String parentId = (String) object.get(PARENT_ID_KEY);
 
-        Task task = new Task(Optional.ofNullable(input), script, Optional.ofNullable(dependsOn));
+        Task task = new Task(Optional.ofNullable(input), script, Optional.ofNullable(dependsOn), Optional.ofNullable(parentId));
         tasksList.add(task);
         return task.getId();
     }
@@ -43,5 +45,17 @@ public class DefaultScriptCloudGateway implements ScriptCloudGateway {
         Object[] arrayData = nativeArray.asObjectArray();
 
         return Arrays.copyOf(arrayData, arrayData.length, String[].class);
+    }
+
+    private Object getInput(Object inputWrapper) {
+        if (inputWrapper == null) {
+            return null;
+        }
+
+        Object object = ScriptUtils.unwrap(inputWrapper);
+        if(object instanceof  NativeArray) {
+            return ((NativeArray)object).asObjectArray();
+        }
+        return object;
     }
 }

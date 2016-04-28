@@ -18,11 +18,12 @@ public class Task implements Serializable {
     private String script;
     private TaskStatus taskStatus;
     private String[] dependsOn;
+    private String parentId;
 
     private Object result;
     private String error;
 
-    public Task(Optional<Object> inputOptional, String script, Optional<String[]> dependsOnOptional) {
+    public Task(Optional<Object> inputOptional, String script, Optional<String[]> dependsOnOptional, Optional<String> parentIdOptional) {
         Validate.notNull(inputOptional, "Provided 'inputOptional' is null");
         Validate.notNull(script, "Provided 'script' is null");
 
@@ -31,6 +32,11 @@ public class Task implements Serializable {
         this.script = script;
         this.taskStatus = TaskStatus.NOT_STARTED;
         this.dependsOn = dependsOnOptional.isPresent() ? dependsOnOptional.get() : new String[]{};
+        this.parentId = parentIdOptional.isPresent() ? parentIdOptional.get() : null;
+    }
+
+    public Task(String script) {
+        this(Optional.empty(), script, Optional.empty(), Optional.empty());
     }
 
     public void setTaskStatus(TaskStatus taskStatus) {

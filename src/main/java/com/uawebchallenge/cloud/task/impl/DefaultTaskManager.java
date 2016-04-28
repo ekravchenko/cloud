@@ -52,8 +52,8 @@ public class DefaultTaskManager implements TaskManager {
     }
 
 
-    public String addTask(Optional<Object> input, String script, Optional<String[]> dependsOn) throws TaskException {
-        Task task = new Task(input, script, dependsOn);
+    public String addTask(Optional<Object> input, String script, Optional<String[]> dependsOn, Optional<String> parentId) throws TaskException {
+        Task task = new Task(input, script, dependsOn, parentId);
         tasksList.add(task);
         return task.getId();
     }

@@ -2,7 +2,6 @@ package com.uawebchallenge.cloud.script;
 
 import com.uawebchallenge.cloud.exception.ScriptException;
 import com.uawebchallenge.cloud.exception.TaskException;
-import jdk.nashorn.api.scripting.ScriptUtils;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -10,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verify;
 
 public class DefaultScriptRunnerTest {
@@ -49,5 +49,23 @@ public class DefaultScriptRunnerTest {
         Object result = scriptRunner.run(script, 2);
 
         assertEquals(7, result);
+    }
+
+    @Test(expected = ScriptException.class)
+    public void runWithWrongMethodName() throws ScriptException {
+        String script = "function foo(input) {return input+5;}";
+
+        ScriptRunner scriptRunner = new DefaultScriptRunner(mockCloudGateway);
+        scriptRunner.run(script, 2);
+        fail("Script execution should fail!");
+    }
+
+    @Test(expected = ScriptException.class)
+    public void runWithIncorrectSyntax() throws ScriptException {
+        String script = "function main(input) {return balblah;}";
+
+        ScriptRunner scriptRunner = new DefaultScriptRunner(mockCloudGateway);
+        scriptRunner.run(script, 2);
+        fail("Script execution should fail!");
     }
 }
