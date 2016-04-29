@@ -1,8 +1,7 @@
-package com.uawebchallenge.cloud.store.impl;
+package com.uawebchallenge.cloud.node;
 
 import com.uawebchallenge.cloud.exception.DataException;
 import com.uawebchallenge.cloud.exception.NodeException;
-import com.uawebchallenge.cloud.store.Node;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

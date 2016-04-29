@@ -1,4 +1,4 @@
-package com.uawebchallenge.cloud.store;
+package com.uawebchallenge.cloud.node;
 
 import com.uawebchallenge.cloud.exception.DataException;
 

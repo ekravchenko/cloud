@@ -1,8 +1,7 @@
-package com.uawebchallenge.cloud.store.impl;
+package com.uawebchallenge.cloud.store;
 
 import com.uawebchallenge.cloud.exception.DataException;
-import com.uawebchallenge.cloud.store.Node;
-import com.uawebchallenge.cloud.store.Store;
+import com.uawebchallenge.cloud.node.Node;
 
 import java.util.Optional;
 

@@ -1,8 +1,7 @@
-package com.uawebchallenge.cloud.store.impl;
+package com.uawebchallenge.cloud.node;
 
 import com.uawebchallenge.cloud.exception.DataException;
 import com.uawebchallenge.cloud.exception.NodeException;
-import com.uawebchallenge.cloud.store.Node;
 import net.tomp2p.futures.FutureBootstrap;
 import net.tomp2p.futures.FutureDHT;
 import net.tomp2p.futures.FutureDiscover;

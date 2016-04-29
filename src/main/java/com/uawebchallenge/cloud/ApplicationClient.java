@@ -1,10 +1,10 @@
 package com.uawebchallenge.cloud;
 
 import com.uawebchallenge.cloud.exception.DataException;
-import com.uawebchallenge.cloud.store.Node;
+import com.uawebchallenge.cloud.node.Node;
 import com.uawebchallenge.cloud.store.StoreKeyConstants;
-import com.uawebchallenge.cloud.store.impl.DistributedStore;
-import com.uawebchallenge.cloud.store.impl.P2PNode;
+import com.uawebchallenge.cloud.store.DistributedStore;
+import com.uawebchallenge.cloud.node.P2PNode;
 import com.uawebchallenge.cloud.task.Task;
 import org.apache.commons.io.IOUtils;
 
