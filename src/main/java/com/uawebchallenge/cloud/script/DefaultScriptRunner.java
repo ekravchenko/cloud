@@ -45,7 +45,7 @@ public class DefaultScriptRunner implements ScriptRunner, ScriptObjectsTransform
         } catch (NoSuchMethodException e) {
             throw ScriptException.methodNotFound(method);
         } catch (Exception e) {
-            throw ScriptException.scriptError(e.getMessage(), script);
+            throw ScriptException.scriptError(script, e);
         }
     }
 

@@ -28,7 +28,7 @@ public class DefaultLibraryBinding implements LibraryBinding {
         try {
             this.store.put(libraryName, script);
         } catch (DataException e) {
-            throw ScriptException.errorSettingData(libraryName, script);
+            throw ScriptException.errorSettingData(libraryName, script, e);
         }
     }
 
@@ -41,7 +41,7 @@ public class DefaultLibraryBinding implements LibraryBinding {
                 scriptEngine.eval(script);
                 loadedLibs.add(libraryName);
             } catch (javax.script.ScriptException e) {
-                throw ScriptException.scriptError(e.getMessage(), script);
+                throw ScriptException.scriptError(script, e);
             }
         }
     }
@@ -55,7 +55,7 @@ public class DefaultLibraryBinding implements LibraryBinding {
             }
             return (String) scriptOptional.get();
         } catch (DataException e) {
-            throw ScriptException.errorGettingData(libraryName);
+            throw ScriptException.errorGettingData(libraryName, e);
         }
     }
 }

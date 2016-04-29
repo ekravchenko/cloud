@@ -31,43 +31,60 @@ public class DefaultCloudBinding implements CloudBinding {
     }
 
     @Override
-    public String createTask(Bindings object) throws TaskException, ScriptException, DataException {
-        Object input = scriptObjectsTransformer.toJava(object.get(INPUT_KEY));
-        Object scriptObject = object.get(SCRIPT_KEY);
-        String script = scriptObject != null ? scriptObject.toString() : null;
-        String[] dependsOn = getDependsOn(object.get(DEPENDS_ON_KEY));
-        String parentId = (String) object.get(PARENT_ID_KEY);
+    public String createTask(Bindings object) throws ScriptException {
+        try {
+            Object input = scriptObjectsTransformer.toJava(object.get(INPUT_KEY));
+            Object scriptObject = object.get(SCRIPT_KEY);
+            String script = scriptObject != null ? scriptObject.toString() : null;
+            String[] dependsOn = getDependsOn(object.get(DEPENDS_ON_KEY));
+            String parentId = (String) object.get(PARENT_ID_KEY);
 
-        Task task = new Task(Optional.ofNullable(input), script, Optional.ofNullable(dependsOn), Optional.ofNullable(parentId));
-        tasksList.add(task);
-        return task.getId();
-    }
-
-    @Override
-    public void put(String key, Object jsValue) throws ScriptException, DataException {
-        Object value = scriptObjectsTransformer.toJava(jsValue);
-        this.store.put(key, value);
-    }
-
-    @Override
-    public Object get(String key) throws ScriptException, DataException {
-        Optional<Object> optional = this.store.get(key);
-        Object value = optional.isPresent() ? optional.get() : null;
-        return scriptObjectsTransformer.fromJava(value);
-    }
-
-    @Override
-    public String topParentId(String taskId) throws TaskException, DataException {
-        Set<Task> tasks = tasksList.tasks();
-
-        String topParentId = null;
-        while (taskId != null) {
-            Optional<Task> taskOptional = tasksList.get(tasks, taskId);
-            taskId = taskOptional.isPresent() ? taskOptional.get().getParentId() : null;
-            topParentId = (taskId != null) ? taskId : topParentId;
+            Task task = new Task(Optional.ofNullable(input), script, Optional.ofNullable(dependsOn), Optional.ofNullable(parentId));
+            tasksList.add(task);
+            return task.getId();
         }
+        catch(TaskException e) {
+            throw ScriptException.errorAddingNewTask(e);
+        }
+    }
 
-        return topParentId;
+    @Override
+    public void put(String key, Object jsValue) throws ScriptException {
+        Object value = scriptObjectsTransformer.toJava(jsValue);
+        try {
+            this.store.put(key, value);
+        } catch (DataException e) {
+            throw ScriptException.errorSettingData(key, value, e);
+        }
+    }
+
+    @Override
+    public Object get(String key) throws ScriptException {
+        try {
+            Optional<Object> optional = this.store.get(key);
+            Object value = optional.isPresent() ? optional.get() : null;
+            return scriptObjectsTransformer.fromJava(value);
+        } catch (DataException e) {
+            throw ScriptException.errorGettingData(key, e);
+        }
+    }
+
+    @Override
+    public String topParentId(String taskId) throws ScriptException {
+        try {
+            Set<Task> tasks = tasksList.tasks();
+
+            String topParentId = null;
+            while (taskId != null) {
+                Optional<Task> taskOptional = tasksList.get(tasks, taskId);
+                taskId = taskOptional.isPresent() ? taskOptional.get().getParentId() : null;
+                topParentId = (taskId != null) ? taskId : topParentId;
+            }
+
+            return topParentId;
+        } catch (TaskException e1) {
+            throw new ScriptException("Error getting list of tasks.", e1);
+        }
     }
 
     private String[] getDependsOn(Object jsObject) throws ScriptException {

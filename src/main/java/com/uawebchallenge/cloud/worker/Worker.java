@@ -44,7 +44,7 @@ public class Worker {
         }
     }
 
-    private void executeTask(Optional<Task> taskOptional) throws TaskException, DataException {
+    private void executeTask(Optional<Task> taskOptional) throws TaskException {
         if (!taskOptional.isPresent()) {
             logger.debug("No pending task was found. Worker is currently idle.");
             sleepQuietly();
@@ -57,18 +57,20 @@ public class Worker {
         } else {
             Task task = taskOptional.get();
             String taskId = task.getId();
-            try {
+           // try {
                 taskManager.startTask(taskId);
                 logger.info(String.format("Executing task '%s'.", taskId));
                 Object result = taskRunner.run(task);
                 logger.info(String.format("Task '%s' finished executing. Result=%s", taskId, result));
                 taskManager.finishTask(taskId, result);
                 workerSleep.reset();
-            } catch (ScriptException e) {
+            //}
+            // TODO this block will move to task runner as well as logic to start task and finish task
+            /*catch (ScriptException e) {
                 final String error = e.getMessage();
                 logger.warn(String.format("Error running task '%s'. Error: %s", taskId, error));
                 taskManager.failTask(taskId, error);
-            }
+            }*/
         }
     }
 

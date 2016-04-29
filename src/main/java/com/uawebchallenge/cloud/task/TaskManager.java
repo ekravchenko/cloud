@@ -7,19 +7,19 @@ import java.util.Optional;
 
 public interface TaskManager {
 
-    Optional<Task> nextPendingTask() throws TaskException, DataException;
+    Optional<Task> nextPendingTask() throws TaskException;
 
-    boolean dependenciesResolved(Task task) throws TaskException, DataException;
+    boolean dependenciesResolved(Task task) throws TaskException;
 
-    Optional<Task> getTask(String taskId) throws TaskException, DataException;
+    Optional<Task> getTask(String taskId) throws TaskException;
 
-    void startTask(String taskId) throws TaskException, DataException;
+    void startTask(String taskId) throws TaskException;
 
-    void scheduleTask(String taskId) throws TaskException, DataException;
+    void scheduleTask(String taskId) throws TaskException;
 
-    void finishTask(String taskId, Object result) throws TaskException, DataException;
+    void finishTask(String taskId, Object result) throws TaskException;
 
-    void failTask(String taskId, String error) throws TaskException, DataException;
+    void failTask(String taskId, String error) throws TaskException;
 
-    String addTask(Optional<Object> input, String script, Optional<String[]> dependsOn, Optional<String> parentId) throws TaskException, DataException;
+    String addTask(Optional<Object> input, String script, Optional<String[]> dependsOn, Optional<String> parentId) throws TaskException;
 }

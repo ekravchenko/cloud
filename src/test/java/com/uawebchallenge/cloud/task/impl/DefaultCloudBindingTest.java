@@ -28,7 +28,7 @@ public class DefaultCloudBindingTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void createTask() throws TaskException, ScriptException, DataException {
+    public void createTask() throws ScriptException, DataException {
         Bindings jsObject = Mockito.mock(Bindings.class);
         Mockito.when(jsObject.get(DefaultCloudBinding.SCRIPT_KEY)).thenReturn("function() {return null;}");
         cloudGateway.createTask(jsObject);
@@ -42,7 +42,7 @@ public class DefaultCloudBindingTest {
     }
 
     @Test
-    public void testTopParentId() throws TaskException, DataException {
+    public void testTopParentId() throws DataException, ScriptException {
         Task task1 = new Task(Optional.empty(), "foo() {}", Optional.empty(), Optional.empty());
         Task task2 = new Task(Optional.empty(), "foo() {}", Optional.empty(), Optional.of(task1.getId()));
         Task task3 = new Task(Optional.empty(), "foo() {}", Optional.empty(), Optional.of(task2.getId()));

@@ -21,29 +21,31 @@ class TasksList {
         this.tasksListLock = new TasksListLock(store);
     }
 
-    void add(Task task) throws TaskException, DataException {
+    void add(Task task) throws TaskException {
         Set<Task> tasks = tasks();
-        this.tasksListLock.lock();
+        lock();
         try {
             tasks.add(task);
             this.store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
+        } catch (DataException e) {
+            throw TaskException.errorSettingData(StoreKeyConstants.TASK_LIST_KEY, tasks, e);
         } finally {
-            this.tasksListLock.unlock();
+            unlock();
         }
     }
 
-    Optional<Task> get(String taskId) throws TaskException, DataException {
+    Optional<Task> get(String taskId) throws TaskException {
         Set<Task> tasks = tasks();
         return tasks.stream().filter(t -> t.getId().equals(taskId)).findFirst();
     }
 
-    Optional<Task> get(Set<Task> tasks, String taskId) throws TaskException {
+    Optional<Task> get(Set<Task> tasks, String taskId) {
         return tasks.stream().filter(t -> t.getId().equals(taskId)).findFirst();
     }
 
-    void update(String taskId, UpdatableTaskData updatableTaskData) throws TaskException, DataException {
+    void update(String taskId, UpdatableTaskData updatableTaskData) throws TaskException {
         Set<Task> tasks = tasks();
-        this.tasksListLock.lock();
+        lock();
         try {
             Optional<Task> taskOptional = tasks.stream().filter(t -> t.getId().equals(taskId)).findFirst();
             if (!taskOptional.isPresent()) {
@@ -65,20 +67,41 @@ class TasksList {
                 this.store.put(task.getId(), task.getResult());
             }
             this.store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
+        } catch (DataException e) {
+            throw  TaskException.errorSettingData(StoreKeyConstants.TASK_LIST_KEY, tasks, e);
         } finally {
-            this.tasksListLock.unlock();
+            unlock();
         }
     }
 
 
+    // TODO I need to make this method private. If someone wants to modify this I should provide LAMDA way
     @SuppressWarnings("unchecked")
-    Set<Task> tasks() throws TaskException, DataException {
+    Set<Task> tasks() throws TaskException {
         try {
             this.tasksListLock.waitForUnlock();
             Optional<Object> taskListOptional = this.store.get(StoreKeyConstants.TASK_LIST_KEY);
             return taskListOptional.isPresent() ? (Set<Task>) taskListOptional.get() : new HashSet<>();
         } catch (LockException e) {
-            throw new TaskException("Problem with lock on tasks list. Cause: " + e.getMessage());
+            throw TaskException.lockTimeout();
+        } catch (DataException e) {
+            throw TaskException.errorGettingData(StoreKeyConstants.TASK_LIST_KEY, e);
+        }
+    }
+
+    private void lock() throws TaskException {
+        try {
+            this.tasksListLock.lock();
+        } catch (LockException e) {
+            throw TaskException.errorLocking(e);
+        }
+    }
+
+    private void unlock() throws TaskException {
+        try {
+            this.tasksListLock.unlock();
+        } catch (LockException e) {
+            throw TaskException.errorUnlocking(e);
         }
     }
 }

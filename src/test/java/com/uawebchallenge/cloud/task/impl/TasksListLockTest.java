@@ -49,7 +49,7 @@ public class TasksListLockTest {
     }
 
     @Test
-    public void lock() throws DataException {
+    public void lock() throws DataException, LockException {
         assertFalse(store.get(StoreKeyConstants.TASK_LIST_LOCK_KEY).isPresent());
         tasksListLock.lock();
         assertTrue(store.get(StoreKeyConstants.TASK_LIST_LOCK_KEY).isPresent());
@@ -57,7 +57,7 @@ public class TasksListLockTest {
     }
 
     @Test
-    public void unlock() throws DataException {
+    public void unlock() throws DataException, LockException {
         assertFalse(store.get(StoreKeyConstants.TASK_LIST_LOCK_KEY).isPresent());
         tasksListLock.unlock();
         assertTrue(store.get(StoreKeyConstants.TASK_LIST_LOCK_KEY).isPresent());
