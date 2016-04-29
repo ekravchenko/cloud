@@ -45,8 +45,9 @@ public class DefaultCloudBinding implements CloudBinding {
     }
 
     @Override
-    public Object get(Object key) {
+    public Object get(Object key) throws ScriptException {
         Optional<Object> optional = this.store.get(key);
-        return optional.isPresent() ? optional.get() : null;
+        Object value = optional.isPresent() ? optional.get() : null;
+        return ScriptUtils.wrapObject(value);
     }
 }

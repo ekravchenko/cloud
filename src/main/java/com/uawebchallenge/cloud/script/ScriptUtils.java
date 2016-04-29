@@ -15,8 +15,10 @@ public class ScriptUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ScriptUtils.class);
 
-    private static final String METHOD_NAME = "convert";
-    private static final String SCRIPT = String.format("function %s(data) {return Java.to(data);}", METHOD_NAME);
+    private static final String UNWRAP_METHOD_NAME = "toJava";
+    private static final String WRAP_METHOD_NAME = "fromJava";
+    private static final String UNWRAP_SCRIPT = String.format("function %s(data) {return Java.to(data);}", UNWRAP_METHOD_NAME);
+    private static final String WRAP_SCRIPT = String.format("function %s(data) {return Java.from(data);}", WRAP_METHOD_NAME);
 
     private static final Invocable engine;
 
@@ -26,10 +28,10 @@ public class ScriptUtils {
         engine = (Invocable) scriptEngine;
 
         try {
-            scriptEngine.eval(SCRIPT);
+            scriptEngine.eval(UNWRAP_SCRIPT);
+            scriptEngine.eval(WRAP_SCRIPT);
         } catch (javax.script.ScriptException e) {
-            logger.error("Error evaluating script. Error:" + e.getMessage());
-            logger.error("Script:" + SCRIPT);
+            logger.error("Error evaluating script", e.getMessage());
         }
     }
 
@@ -41,11 +43,11 @@ public class ScriptUtils {
             return wrapper;
         }
         try {
-            return engine.invokeFunction(METHOD_NAME, wrapper);
+            return engine.invokeFunction(UNWRAP_METHOD_NAME, wrapper);
         } catch (javax.script.ScriptException e) {
-            throw ScriptException.scriptError(e.getMessage(), SCRIPT);
+            throw ScriptException.scriptError(e.getMessage(), UNWRAP_SCRIPT);
         } catch (NoSuchMethodException e) {
-            throw ScriptException.methodNotFound(METHOD_NAME);
+            throw ScriptException.methodNotFound(UNWRAP_METHOD_NAME);
         }
     }
 
@@ -55,5 +57,21 @@ public class ScriptUtils {
             return null;
         }
         return Arrays.copyOf(arrayData, arrayData.length, clazz);
+    }
+
+    public static Object wrapObject(Object array) throws ScriptException {
+        if (array == null) {
+            return null;
+        }
+        if (!array.getClass().isArray()) {
+            return array;
+        }
+        try {
+            return engine.invokeFunction(WRAP_METHOD_NAME, array);
+        } catch (javax.script.ScriptException e) {
+            throw ScriptException.scriptError(e.getMessage(), WRAP_SCRIPT);
+        } catch (NoSuchMethodException e) {
+            throw ScriptException.methodNotFound(WRAP_METHOD_NAME);
+        }
     }
 }
