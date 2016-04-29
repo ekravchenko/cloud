@@ -25,7 +25,6 @@ public class DistributedStore implements Store {
             Data data = new Data(value);
             peer.put(hash).setData(data).start().awaitUninterruptibly();
         } catch (IOException e) {
-            e.printStackTrace();
             throw DataException.serializationError(value, e.getMessage());
         }
     }
@@ -42,11 +41,7 @@ public class DistributedStore implements Store {
                 return Optional.of(object);
             }
             return Optional.empty();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            throw DataException.classNotFoundError(e.getMessage());
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (ClassNotFoundException | IOException e) {
             throw DataException.deserializationError(e.getMessage());
         }
     }

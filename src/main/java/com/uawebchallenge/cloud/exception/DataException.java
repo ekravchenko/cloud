@@ -15,10 +15,4 @@ public class DataException extends Exception {
         String error = "Couldn't deserialize object that was received. Error details: " + details;
         return new DataException(error);
     }
-
-    public static DataException classNotFoundError(String details) {
-        String error = "Couldn't deserialize object that was received. Specific class was not found. Error details: " + details;
-        return new DataException(error);
-    }
-
 }
