@@ -17,6 +17,10 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
+    <logger name="net.tomp2p" level="debug" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
     <root level="error">
         <appender-ref ref="STDOUT"/>
     </root>
