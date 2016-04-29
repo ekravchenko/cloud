@@ -32,6 +32,16 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.tomp2p</groupId>
+            <artifactId>TomP2P</artifactId>
+            <version>${tomp2p.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
@@ -52,17 +62,6 @@
             <artifactId>mockito-all</artifactId>
             <version>${mockito.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>${commons-io.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.tomp2p</groupId>
-            <artifactId>TomP2P</artifactId>
-            <version>${tomp2p.version}</version>
         </dependency>
     </dependencies>
 
