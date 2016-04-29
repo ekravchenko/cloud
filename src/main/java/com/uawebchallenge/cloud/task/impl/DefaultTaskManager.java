@@ -68,7 +68,7 @@ public class DefaultTaskManager implements TaskManager {
             if (!dependantTaskOptional.isPresent()) {
                 final String error = String.format("Task depends on task '%s' which couldn't be found.", dependantTaskId);
                 failTask(task.getId(), error);
-                return false;
+                throw TaskException.taskNotFound(dependantTaskId);
             }
             Task dependantTask = dependantTaskOptional.get();
 
