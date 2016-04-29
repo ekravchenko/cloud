@@ -167,6 +167,7 @@ function evenSort(context) {
 
 function sortPairs(context) {
     library.require("arraysEquals");
+    library.require("printArray");
 
     var address1 = context.input[0];
     var address2 = context.input[1];
@@ -175,8 +176,8 @@ function sortPairs(context) {
     var array2 = cloud.get(address2);
 
     log.debug("Sorting arrays");
-    log.trace("Array1: " + array1);
-    log.trace("Array2: " + array2);
+    log.trace("Array1: " + printArray(array1));
+    log.trace("Array2: " + printArray(array2));
 
     var arrayToSort = array1.concat(array2);
     var arrayToSortCopy = array1.concat(array2);
