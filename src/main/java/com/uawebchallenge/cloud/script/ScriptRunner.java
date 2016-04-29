@@ -6,5 +6,5 @@ public interface ScriptRunner {
 
     String SCRIPT_ENGINE_NAME = "nashorn";
 
-    Object run(String script,  Object... args) throws ScriptException;
+    Object run(String script, String method, Object... args) throws ScriptException;
 }

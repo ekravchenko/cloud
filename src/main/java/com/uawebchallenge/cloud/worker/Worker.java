@@ -37,6 +37,7 @@ public class Worker {
                 Optional<Task> taskOptional = taskManager.nextPendingTask();
                 executeTask(taskOptional);
             } catch (Exception e) {
+                e.printStackTrace();
                 logger.error(e.getMessage());
             }
         }
@@ -63,6 +64,7 @@ public class Worker {
                 taskManager.finishTask(taskId, result);
                 workerSleep.reset();
             } catch (ScriptException e) {
+                e.printStackTrace();
                 final String error = e.getMessage();
                 logger.warn(String.format("Error running task '%s'. Error: %s", taskId, error));
                 taskManager.failTask(taskId, error);

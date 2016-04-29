@@ -12,4 +12,6 @@ public interface CloudBinding {
     void put(Object key, Object value) throws ScriptException;
 
     Object get(Object key) throws ScriptException;
+
+    String topParentId(String taskId) throws TaskException;
 }

@@ -3,12 +3,14 @@ package com.uawebchallenge.cloud.task.impl;
 import com.uawebchallenge.cloud.exception.ScriptException;
 import com.uawebchallenge.cloud.exception.TaskException;
 import com.uawebchallenge.cloud.script.CloudBinding;
-import com.uawebchallenge.cloud.script.ScriptUtils;
+import com.uawebchallenge.cloud.script.ScriptObjectsTransformer;
 import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.task.Task;
 
 import javax.script.Bindings;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
 
 public class DefaultCloudBinding implements CloudBinding {
 
@@ -19,18 +21,20 @@ public class DefaultCloudBinding implements CloudBinding {
 
     private final TasksList tasksList;
     private final Store store;
+    private final ScriptObjectsTransformer scriptObjectsTransformer;
 
-    public DefaultCloudBinding(Store store) {
+    public DefaultCloudBinding(Store store, ScriptObjectsTransformer scriptObjectsTransformer) {
         this.store = store;
+        this.scriptObjectsTransformer = scriptObjectsTransformer;
         this.tasksList = new TasksList(store);
     }
 
     @Override
     public String createTask(Bindings object) throws TaskException, ScriptException {
-        Object input = ScriptUtils.unwrapObject(object.get(INPUT_KEY));
+        Object input = scriptObjectsTransformer.toJava(object.get(INPUT_KEY));
         Object scriptObject = object.get(SCRIPT_KEY);
         String script = scriptObject != null ? scriptObject.toString() : null;
-        String[] dependsOn = ScriptUtils.unwrapArray(object.get(DEPENDS_ON_KEY), String[].class);
+        String[] dependsOn = getDependsOn(object.get(DEPENDS_ON_KEY));
         String parentId = (String) object.get(PARENT_ID_KEY);
 
         Task task = new Task(Optional.ofNullable(input), script, Optional.ofNullable(dependsOn), Optional.ofNullable(parentId));
@@ -40,7 +44,7 @@ public class DefaultCloudBinding implements CloudBinding {
 
     @Override
     public void put(Object key, Object jsValue) throws ScriptException {
-        Object value = ScriptUtils.unwrapObject(jsValue);
+        Object value = scriptObjectsTransformer.toJava(jsValue);
         this.store.put(key, value);
     }
 
@@ -48,6 +52,28 @@ public class DefaultCloudBinding implements CloudBinding {
     public Object get(Object key) throws ScriptException {
         Optional<Object> optional = this.store.get(key);
         Object value = optional.isPresent() ? optional.get() : null;
-        return ScriptUtils.wrapObject(value);
+        return scriptObjectsTransformer.fromJava(value);
+    }
+
+    @Override
+    public String topParentId(String taskId) throws TaskException {
+        Set<Task> tasks = tasksList.tasks();
+
+        String topParentId = null;
+        while (taskId != null) {
+            Optional<Task> taskOptional = tasksList.get(tasks, taskId);
+            taskId = taskOptional.isPresent() ? taskOptional.get().getParentId() : null;
+            topParentId = (taskId != null) ? taskId : topParentId;
+        }
+
+        return topParentId;
+    }
+
+    private String[] getDependsOn(Object jsObject) throws ScriptException {
+        Object[] arrayData = (Object[]) scriptObjectsTransformer.toJava(jsObject);
+        if (arrayData == null) {
+            return null;
+        }
+        return Arrays.copyOf(arrayData, arrayData.length, String[].class);
     }
 }

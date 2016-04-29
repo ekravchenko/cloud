@@ -1,7 +1,20 @@
+/**
+ * Function provides access to the array that we are going to sort
+ *
+ * @returns {string[]} - Array that should be sorted
+ */
 function arrayToSort() {
     return ["true", "goal", "working", "trouble", "awesome", "fun", "dangerous", "understand", "mine"];
 }
 
+/**
+ * Function that helps break array into smaller arrays (sub arrays or buckets). The trick is that we are not going to
+ * slice array into smaller parts in this task but rather we will create tasks to slice specific part. This tasks will
+ * run in parallel.
+ *
+ * @param context - task execution context object. it gets the following data: taskID, parentId (parent task ID), input
+ * (input data), dependsOn (task dependencies on other tasks)
+ */
 function divideIntoBuckets(context) {
     library.require("arrayToSort");
 
@@ -27,7 +40,7 @@ function divideIntoBuckets(context) {
         };
 
         var taskId = cloud.createTask(task);
-        tasks[i] = taskId;
+        tasks.push(taskId);
     }
 
     cloud.put(context.taskId, false);
@@ -153,7 +166,6 @@ function evenSort(context) {
 }
 
 function sortPairs(context) {
-    library.require("printArray");
     library.require("arraysEquals");
 
     var address1 = context.input[0];
@@ -163,12 +175,13 @@ function sortPairs(context) {
     var array2 = cloud.get(address2);
 
     log.debug("Sorting arrays");
-    log.trace("Array1: " + printArray(array1));
-    log.trace("Array2: " + printArray(array2));
+    log.trace("Array1: " + array1);
+    log.trace("Array2: " + array2);
 
     var arrayToSort = array1.concat(array2);
     var arrayToSortCopy = array1.concat(array2);
-    log.trace("ArrayToSort: " + printArray(arrayToSort));
+
+      log.trace("ArrayToSort: " + printArray(arrayToSort));
     log.trace("ArrayToSortCopy: " + printArray(arrayToSortCopy));
 
     arrayToSort.sort();
@@ -207,6 +220,8 @@ function arraysEquals(array1, array2) {
 
 function checkSortResult(context, even) {
     library.require("printArray");
+    library.require("addArray");
+
     var sortTasks = context.dependsOn;
     log.trace("Check sorting results");
 
@@ -224,12 +239,21 @@ function checkSortResult(context, even) {
     var previousSortingResult = cloud.get(context.parentId);
     log.trace("Round before sorting didn't happen?:" + previousSortingResult);
 
+
     if (previousSortingResult && allAlreadySorted) {
         log.info("Everything is sorted congratulations!");
+
+        var finalArray = [];
+
         for (var i = 0; i < context.input.length; i++) {
             var sorted = cloud.get(context.input[i]);
-            log.info(printArray(sorted));
+            addArray(finalArray, sorted);
         }
+
+        var topParentId = cloud.topParentId(context.taskId);
+        log.info("Before puttin!");
+        log.info(finalArray);
+        cloud.put(topParentId, finalArray);
     }
     else if (even) {
         var evenSorting = {
@@ -275,6 +299,12 @@ function printArray(array) {
     return str;
 }
 
+function addArray(array, extra) {
+    for (var i = 0; i < extra.length; i++) {
+        array.push(extra[i]);
+    }
+}
+
 function main(context) {
     library.export("arrayToSort", arrayToSort);
     library.export("divideIntoBuckets", divideIntoBuckets);
@@ -285,6 +315,7 @@ function main(context) {
     library.export("printArray", printArray);
     library.export("arraysEquals", arraysEquals);
     library.export("checkSortResult", checkSortResult);
+    library.export("addArray", addArray);
 
     var task = {
         input: null,

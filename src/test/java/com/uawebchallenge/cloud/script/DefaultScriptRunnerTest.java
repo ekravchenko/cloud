@@ -24,7 +24,7 @@ public class DefaultScriptRunnerTest {
                 "cloud.createTask(task);}";
 
         ScriptRunner scriptRunner = new DefaultScriptRunner(store);
-        scriptRunner.run(script);
+        scriptRunner.run(script, "main");
 
         Optional<Object> tasksOptional = store.get(StoreKeyConstants.TASK_LIST_KEY);
         assertNotNull(tasksOptional);
@@ -43,7 +43,7 @@ public class DefaultScriptRunnerTest {
         String script = "function main() {return 2+5;}";
 
         ScriptRunner scriptRunner = new DefaultScriptRunner(store);
-        Object result = scriptRunner.run(script);
+        Object result = scriptRunner.run(script, "main");
 
         assertEquals(7, result);
     }
@@ -53,7 +53,7 @@ public class DefaultScriptRunnerTest {
         String script = "function main(input) {return input+5;}";
 
         ScriptRunner scriptRunner = new DefaultScriptRunner(store);
-        Object result = scriptRunner.run(script, 2);
+        Object result = scriptRunner.run(script, "main", 2);
 
         assertEquals(7, result);
     }
@@ -63,7 +63,7 @@ public class DefaultScriptRunnerTest {
         String script = "function foo(input) {return input+5;}";
 
         ScriptRunner scriptRunner = new DefaultScriptRunner(store);
-        scriptRunner.run(script, 2);
+        scriptRunner.run(script, "main", 2);
         fail("Script execution should fail!");
     }
 
@@ -72,7 +72,21 @@ public class DefaultScriptRunnerTest {
         String script = "function main(input) {return tmp;}";
 
         ScriptRunner scriptRunner = new DefaultScriptRunner(store);
-        scriptRunner.run(script, 2);
+        scriptRunner.run(script, "main", 2);
         fail("Script execution should fail!");
+    }
+
+    @Test
+    public void testArrays() throws ScriptException, javax.script.ScriptException, NoSuchMethodException {
+        ScriptRunner scriptRunner = new DefaultScriptRunner(store);
+        store.put("myArray", new int[] {1, 2, 3});
+
+        Optional<Object> myArray = store.get("myArray");
+        Object o = myArray.get();
+        Object array = ((ScriptObjectsTransformer) scriptRunner).fromJava(o);
+
+        final String script = "function main(array) { var myArray=cloud.get('myArray'); log.info(myArray);}";
+        //Object array = ((ScriptObjectsTransformer) scriptRunner).fromJava(new String[]{"1", "2"});
+        scriptRunner.run(script, "main", array);
     }
 }

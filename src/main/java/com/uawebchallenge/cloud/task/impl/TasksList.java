@@ -36,6 +36,10 @@ class TasksList {
         return tasks.stream().filter(t -> t.getId().equals(taskId)).findFirst();
     }
 
+    Optional<Task> get(Set<Task> tasks, String taskId) throws TaskException {
+        return tasks.stream().filter(t -> t.getId().equals(taskId)).findFirst();
+    }
+
     void update(String taskId, UpdatableTaskData updatableTaskData) throws TaskException {
         Set<Task> tasks = tasks();
         this.tasksListLock.lock();

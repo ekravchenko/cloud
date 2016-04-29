@@ -5,6 +5,7 @@ import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.task.Task;
 import com.uawebchallenge.cloud.task.TaskManager;
 import com.uawebchallenge.cloud.task.TaskStatus;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Optional;
 import java.util.Set;
@@ -18,7 +19,15 @@ public class DefaultTaskManager implements TaskManager {
     }
 
     public Optional<Task> nextPendingTask() throws TaskException {
-        return tasksList.tasks().stream().filter(t -> t.getTaskStatus().equals(TaskStatus.NOT_STARTED)).findFirst();
+        // First find any task that is not started and has no dependencies
+        Optional<Task> task = tasksList.tasks().stream().parallel()
+                .filter(t -> t.getTaskStatus().equals(TaskStatus.NOT_STARTED) && ArrayUtils.getLength(t.getDependsOn()) == 0)
+                .findAny();
+        if (task.isPresent()) {
+            return task;
+        }
+        // Otherwise try to find any task at all
+        return tasksList.tasks().stream().parallel().filter(t -> t.getTaskStatus().equals(TaskStatus.NOT_STARTED)).findAny();
     }
 
     public Optional<Task> getTask(String taskId) throws TaskException {

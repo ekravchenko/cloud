@@ -24,7 +24,7 @@ public class WorkerTest {
     private final static Logger logger = LoggerFactory.getLogger(WorkerTest.class);
     private Store store = new StoreEmulator();
 
-    @Test(timeout = 100000)
+    @Test(timeout = 20000)
     public void run() throws IOException {
         String script = getScript();
 
@@ -46,7 +46,11 @@ public class WorkerTest {
         Task resultTask = findTask(task.getId());
         assertNotNull(resultTask);
         assertEquals(TaskStatus.FINISHED, resultTask.getTaskStatus());
-//        assertNotNull(resultTask.getResult());
+
+        Optional<Object> result = store.get(resultTask.getId());
+        assertTrue(result.isPresent());
+        String[] expectedArray = {"awesome","dangerous","fun","goal","mine","trouble","true","understand","working"};
+        assertArrayEquals(expectedArray, (Object[]) result.get());
     }
 
     private String getScript() throws IOException {
