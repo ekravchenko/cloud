@@ -23,7 +23,7 @@ public class P2PNode implements Node {
     private final Peer peer;
 
 
-    public P2PNode(Optional<Integer> portOptional) {
+    public P2PNode(Optional<Integer> portOptional) throws NodeException {
         Integer port = portOptional.orElse(DEFAULT_PORT);
 
         try {
@@ -36,7 +36,7 @@ public class P2PNode implements Node {
     }
 
     @Override
-    public void connectViaIp(String hostIp, Integer port) {
+    public void connectViaIp(String hostIp, Integer port) throws NodeException {
         try {
             InetAddress address = Inet4Address.getByName(hostIp);
             FutureDiscover futureDiscover = peer.discover().setInetAddress(address).setPorts(port).start();

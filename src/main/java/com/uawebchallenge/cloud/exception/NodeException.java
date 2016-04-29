@@ -1,6 +1,6 @@
 package com.uawebchallenge.cloud.exception;
 
-public class NodeException extends RuntimeException {
+public class NodeException extends Exception {
 
     private NodeException(String message) {
         super(message);

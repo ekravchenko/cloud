@@ -15,7 +15,7 @@ public class P2PNodeTest {
     private final static Logger logger = LoggerFactory.getLogger(P2PNodeTest.class);
 
     @Test
-    public void testCreatePeer() {
+    public void testCreatePeer() throws NodeException {
         Node node = new P2PNode(Optional.of(4003));
         assertNotNull(node);
 
@@ -23,7 +23,7 @@ public class P2PNodeTest {
     }
 
     @Test
-    public void testConnectViaIp() throws InterruptedException, DataException {
+    public void testConnectViaIp() throws InterruptedException, DataException, NodeException {
         final String key = "key";
         final String value = "Hello world";
 
@@ -45,7 +45,7 @@ public class P2PNodeTest {
     }
 
     @Test
-    public void testConnectViaBroadcast() throws InterruptedException, DataException {
+    public void testConnectViaBroadcast() throws InterruptedException, DataException, NodeException {
         final String key = "key";
         final String value = "Hello world";
 

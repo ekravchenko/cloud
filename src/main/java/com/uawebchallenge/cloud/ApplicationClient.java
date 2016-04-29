@@ -1,6 +1,7 @@
 package com.uawebchallenge.cloud;
 
 import com.uawebchallenge.cloud.exception.DataException;
+import com.uawebchallenge.cloud.exception.NodeException;
 import com.uawebchallenge.cloud.node.Node;
 import com.uawebchallenge.cloud.store.StoreKeyConstants;
 import com.uawebchallenge.cloud.store.DistributedStore;
@@ -16,7 +17,7 @@ import java.util.Set;
 
 public class ApplicationClient {
 
-    public static void main(String[] args) throws InterruptedException, DataException, IOException {
+    public static void main(String[] args) throws NodeException, IOException, DataException {
         Node node = new P2PNode(Optional.of(4001));
         node.connectViaIp("127.0.0.1", 4000);
 
