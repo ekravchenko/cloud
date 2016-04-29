@@ -20,6 +20,7 @@ public class Task implements Serializable {
     private String[] dependsOn;
     private String parentId;
 
+    // TODO REmove result and error.
     private Object result;
     private String error;
 
