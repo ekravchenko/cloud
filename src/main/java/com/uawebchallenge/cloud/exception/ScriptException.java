@@ -17,4 +17,12 @@ public class ScriptException extends Exception {
     public static ScriptException libraryNotExported(String library) {
         return new ScriptException(String.format("Library '%s' was not exported.", library));
     }
+
+    public static ScriptException errorSettingData(String key, String value) {
+        return new ScriptException(String.format("Error setting data with key '%s' and value ''.", key, value));
+    }
+
+    public static ScriptException errorGettingData(String key) {
+        return new ScriptException(String.format("Error getting data with key '%s'", key));
+    }
 }

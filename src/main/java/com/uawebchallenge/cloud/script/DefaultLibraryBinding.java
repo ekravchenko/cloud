@@ -23,25 +23,39 @@ public class DefaultLibraryBinding implements LibraryBinding {
     }
 
     @Override
-    public void export(String libraryName, Bindings scriptObject) throws DataException {
+    public void export(String libraryName, Bindings scriptObject) throws ScriptException {
         String script = scriptObject.toString();
-        this.store.put(libraryName, script);
+        try {
+            this.store.put(libraryName, script);
+        } catch (DataException e) {
+            throw ScriptException.errorSettingData(libraryName, script);
+        }
     }
 
     @Override
-    public void require(String libraryName) throws ScriptException, DataException {
+    public void require(String libraryName) throws ScriptException {
         if (!loadedLibs.contains(libraryName)) {
-            Optional<Object> scriptOptional = this.store.get(libraryName);
-            if (!scriptOptional.isPresent()) {
-                throw ScriptException.libraryNotExported(libraryName);
-            }
-            String script = (String) scriptOptional.get();
+
+            String script = getScript(libraryName);
             try {
                 scriptEngine.eval(script);
                 loadedLibs.add(libraryName);
             } catch (javax.script.ScriptException e) {
                 throw ScriptException.scriptError(e.getMessage(), script);
             }
+        }
+    }
+
+    private String getScript(String libraryName) throws ScriptException {
+
+        try {
+            Optional<Object> scriptOptional = this.store.get(libraryName);
+            if (!scriptOptional.isPresent()) {
+                throw ScriptException.libraryNotExported(libraryName);
+            }
+            return (String) scriptOptional.get();
+        } catch (DataException e) {
+            throw ScriptException.errorGettingData(libraryName);
         }
     }
 }
