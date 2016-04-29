@@ -1,5 +1,6 @@
 package com.uawebchallenge.cloud.task.impl;
 
+import com.uawebchallenge.cloud.exception.DataException;
 import com.uawebchallenge.cloud.exception.TaskException;
 import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.store.StoreEmulator;
@@ -20,7 +21,7 @@ public class TasksListTest {
     private final TasksList tasksList = new TasksList(store);
 
     @Test
-    public void testGetWhenTaskExists() throws TaskException {
+    public void testGetWhenTaskExists() throws TaskException, DataException {
         final Task task = new Task("foo() {}");
         Set<Task> tasks = new HashSet<>();
         tasks.add(task);
@@ -32,7 +33,7 @@ public class TasksListTest {
     }
 
     @Test
-    public void testGetWhenTaskDoesntExist() throws TaskException {
+    public void testGetWhenTaskDoesntExist() throws TaskException, DataException {
         Optional<Task> taskOptional = tasksList.get("RandomId");
         assertNotNull(taskOptional);
         assertFalse(taskOptional.isPresent());
@@ -40,7 +41,7 @@ public class TasksListTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void testAdd() throws TaskException {
+    public void testAdd() throws TaskException, DataException {
         final Task task = new Task("foo() {}");
         tasksList.add(task);
 
@@ -54,7 +55,7 @@ public class TasksListTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void testUpdate() throws TaskException {
+    public void testUpdate() throws TaskException, DataException {
         final Task task = new Task("foo() {}");
         Set<Task> tasks = new HashSet<>();
         tasks.add(task);
@@ -75,7 +76,7 @@ public class TasksListTest {
     }
 
     @Test(expected = TaskException.class)
-    public void testUpdateTwice() throws TaskException {
+    public void testUpdateTwice() throws TaskException, DataException {
         final Task task = new Task("foo() {}");
         Set<Task> tasks = new HashSet<>();
         tasks.add(task);
@@ -88,7 +89,7 @@ public class TasksListTest {
     }
 
     @Test(expected = TaskException.class)
-    public void testUpdateUnknownTask() throws TaskException {
+    public void testUpdateUnknownTask() throws TaskException, DataException {
         final Task task = new Task("foo() {}");
         Set<Task> tasks = new HashSet<>();
         tasks.add(task);

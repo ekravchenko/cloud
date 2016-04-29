@@ -1,10 +1,12 @@
 package com.uawebchallenge.cloud.store;
 
+import com.uawebchallenge.cloud.exception.DataException;
+
 import java.util.Optional;
 
 public interface Store {
 
-    void put(Object key, Object value);
+    void put(String key, Object value) throws DataException;
 
-    Optional<Object> get(Object key);
+    Optional<Object> get(String key) throws DataException;
 }

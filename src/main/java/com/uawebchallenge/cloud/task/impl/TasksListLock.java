@@ -1,5 +1,6 @@
 package com.uawebchallenge.cloud.task.impl;
 
+import com.uawebchallenge.cloud.exception.DataException;
 import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.store.StoreKeyConstants;
 import org.slf4j.Logger;
@@ -21,7 +22,7 @@ class TasksListLock {
         this.totalSleep = 0;
     }
 
-    void waitForUnlock() throws LockException {
+    void waitForUnlock() throws LockException, DataException {
         if (totalSleep > MAX_TOTAL_SLEEP) {
             long oldTotalSleep = resetTotalSleep();
             logger.warn("Waited too long for unlock. TotalSleep=" + oldTotalSleep);
@@ -40,11 +41,11 @@ class TasksListLock {
         }
     }
 
-    void lock() {
+    void lock() throws DataException {
         this.store.put(StoreKeyConstants.TASK_LIST_LOCK_KEY, Boolean.TRUE);
     }
 
-    void unlock() {
+    void unlock() throws DataException {
         this.store.put(StoreKeyConstants.TASK_LIST_LOCK_KEY, Boolean.FALSE);
     }
 

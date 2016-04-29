@@ -1,5 +1,6 @@
 package com.uawebchallenge.cloud.task.impl;
 
+import com.uawebchallenge.cloud.exception.DataException;
 import com.uawebchallenge.cloud.exception.TaskException;
 import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.store.StoreKeyConstants;
@@ -20,7 +21,7 @@ class TasksList {
         this.tasksListLock = new TasksListLock(store);
     }
 
-    void add(Task task) throws TaskException {
+    void add(Task task) throws TaskException, DataException {
         Set<Task> tasks = tasks();
         this.tasksListLock.lock();
         try {
@@ -31,7 +32,7 @@ class TasksList {
         }
     }
 
-    Optional<Task> get(String taskId) throws TaskException {
+    Optional<Task> get(String taskId) throws TaskException, DataException {
         Set<Task> tasks = tasks();
         return tasks.stream().filter(t -> t.getId().equals(taskId)).findFirst();
     }
@@ -40,7 +41,7 @@ class TasksList {
         return tasks.stream().filter(t -> t.getId().equals(taskId)).findFirst();
     }
 
-    void update(String taskId, UpdatableTaskData updatableTaskData) throws TaskException {
+    void update(String taskId, UpdatableTaskData updatableTaskData) throws TaskException, DataException {
         Set<Task> tasks = tasks();
         this.tasksListLock.lock();
         try {
@@ -71,7 +72,7 @@ class TasksList {
 
 
     @SuppressWarnings("unchecked")
-    Set<Task> tasks() throws TaskException {
+    Set<Task> tasks() throws TaskException, DataException {
         try {
             this.tasksListLock.waitForUnlock();
             Optional<Object> taskListOptional = this.store.get(StoreKeyConstants.TASK_LIST_KEY);

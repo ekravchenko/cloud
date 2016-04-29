@@ -1,5 +1,6 @@
 package com.uawebchallenge.cloud.task.impl;
 
+import com.uawebchallenge.cloud.exception.DataException;
 import com.uawebchallenge.cloud.exception.TaskException;
 import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.store.StoreEmulator;
@@ -22,7 +23,7 @@ public class DefaultTaskManagerTest {
     private final TaskManager taskManager = new DefaultTaskManager(store);
 
     @Test
-    public void getNextPendingTask() throws TaskException {
+    public void getNextPendingTask() throws TaskException, DataException {
         final Task task1 = new Task("foo() {}");
         task1.setTaskStatus(TaskStatus.NOT_SCHEDULED);
 
@@ -49,7 +50,7 @@ public class DefaultTaskManagerTest {
     }
 
     @Test
-    public void getTask() throws TaskException {
+    public void getTask() throws TaskException, DataException {
         final Task task1 = new Task("foo() {}");
         task1.setTaskStatus(TaskStatus.NOT_SCHEDULED);
 
@@ -64,7 +65,7 @@ public class DefaultTaskManagerTest {
     }
 
     @Test
-    public void schedule() throws TaskException {
+    public void schedule() throws TaskException, DataException {
         final Task task1 = new Task("foo() {}");
         task1.setTaskStatus(TaskStatus.NOT_SCHEDULED);
 
@@ -87,7 +88,7 @@ public class DefaultTaskManagerTest {
     }
 
     @Test
-    public void start() throws TaskException {
+    public void start() throws TaskException, DataException {
         final Task task1 = new Task("foo() {}");
 
         Set<Task> tasks = new HashSet<>();
@@ -109,7 +110,7 @@ public class DefaultTaskManagerTest {
     }
 
     @Test
-    public void finish() throws TaskException {
+    public void finish() throws TaskException, DataException {
         final Task task1 = new Task("foo() {}");
 
         Set<Task> tasks = new HashSet<>();
@@ -133,7 +134,7 @@ public class DefaultTaskManagerTest {
     }
 
     @Test
-    public void error() throws TaskException {
+    public void error() throws TaskException, DataException {
         final Task task1 = new Task("foo() {}");
 
         Set<Task> tasks = new HashSet<>();
@@ -157,7 +158,7 @@ public class DefaultTaskManagerTest {
     }
 
     @Test
-    public void add() throws TaskException {
+    public void add() throws TaskException, DataException {
         taskManager.addTask(Optional.empty(), "foo() {}", Optional.empty(), Optional.empty());
 
         Optional<Object> tasksOptional = store.get(StoreKeyConstants.TASK_LIST_KEY);
@@ -172,7 +173,7 @@ public class DefaultTaskManagerTest {
     }
 
     @Test
-    public void dependenciesResolvedWhenAllCool() throws TaskException {
+    public void dependenciesResolvedWhenAllCool() throws TaskException, DataException {
         final Task task1 = new Task("foo() {}");
         task1.setTaskStatus(TaskStatus.FINISHED);
 
@@ -197,7 +198,7 @@ public class DefaultTaskManagerTest {
     }
 
     @Test
-    public void dependenciesResolvedWhenOneTaskNotStarted() throws TaskException {
+    public void dependenciesResolvedWhenOneTaskNotStarted() throws TaskException, DataException {
         final Task task1 = new Task("foo() {}");
         task1.setTaskStatus(TaskStatus.FINISHED);
 
@@ -222,7 +223,7 @@ public class DefaultTaskManagerTest {
     }
 
     @Test
-    public void dependenciesResolvedWhenOneTaskHasError() throws TaskException {
+    public void dependenciesResolvedWhenOneTaskHasError() throws TaskException, DataException {
         final Task task1 = new Task(Optional.empty(), "foo() {}", Optional.empty(), Optional.empty());
         task1.setTaskStatus(TaskStatus.FINISHED);
 
@@ -256,7 +257,7 @@ public class DefaultTaskManagerTest {
     }
 
     @Test(expected = TaskException.class)
-    public void dependenciesResolvedWhenOneTaskNotFound() throws TaskException {
+    public void dependenciesResolvedWhenOneTaskNotFound() throws TaskException, DataException {
         final Task task1 = new Task(Optional.empty(), "foo() {}", Optional.empty(), Optional.empty());
         task1.setTaskStatus(TaskStatus.FINISHED);
 

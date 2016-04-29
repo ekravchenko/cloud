@@ -1,9 +1,12 @@
 package com.uawebchallenge.cloud.task.impl;
 
+import com.uawebchallenge.cloud.exception.DataException;
 import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.store.StoreEmulator;
 import com.uawebchallenge.cloud.store.StoreKeyConstants;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -12,11 +15,12 @@ import static org.junit.Assert.*;
 
 public class TasksListLockTest {
 
+    private final Logger logger = LoggerFactory.getLogger(TasksListLockTest.class);
     private final Store store = new StoreEmulator();
     private final TasksListLock tasksListLock = new TasksListLock(store);
 
     @Test
-    public void waitForUnlockWhenLocked() throws LockException {
+    public void waitForUnlockWhenLocked() throws LockException, DataException {
         store.put(StoreKeyConstants.TASK_LIST_LOCK_KEY, Boolean.TRUE);
         final long lockTime = 1000;
         unlock(lockTime);
@@ -32,7 +36,7 @@ public class TasksListLockTest {
     }
 
     @Test
-    public void waitForUnlockWhenNotLocked() throws LockException {
+    public void waitForUnlockWhenNotLocked() throws LockException, DataException {
         final long lockTime = 0;
         long startTime = System.currentTimeMillis();
         tasksListLock.waitForUnlock();
@@ -45,7 +49,7 @@ public class TasksListLockTest {
     }
 
     @Test
-    public void lock() {
+    public void lock() throws DataException {
         assertFalse(store.get(StoreKeyConstants.TASK_LIST_LOCK_KEY).isPresent());
         tasksListLock.lock();
         assertTrue(store.get(StoreKeyConstants.TASK_LIST_LOCK_KEY).isPresent());
@@ -53,7 +57,7 @@ public class TasksListLockTest {
     }
 
     @Test
-    public void unlock() {
+    public void unlock() throws DataException {
         assertFalse(store.get(StoreKeyConstants.TASK_LIST_LOCK_KEY).isPresent());
         tasksListLock.unlock();
         assertTrue(store.get(StoreKeyConstants.TASK_LIST_LOCK_KEY).isPresent());
@@ -61,7 +65,7 @@ public class TasksListLockTest {
     }
 
     @Test(timeout = TasksListLock.MAX_TOTAL_SLEEP * 2, expected = LockException.class)
-    public void waitForUnlockUnlimited() throws LockException {
+    public void waitForUnlockUnlimited() throws LockException, DataException {
         store.put(StoreKeyConstants.TASK_LIST_LOCK_KEY, Boolean.TRUE);
 
         TasksListLock tasksListLock = new TasksListLock(store);
@@ -73,7 +77,11 @@ public class TasksListLockTest {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                store.put(StoreKeyConstants.TASK_LIST_LOCK_KEY, Boolean.FALSE);
+                try {
+                    store.put(StoreKeyConstants.TASK_LIST_LOCK_KEY, Boolean.FALSE);
+                } catch (DataException e) {
+                    logger.error(e.getMessage(), e);
+                }
             }
         }, millis);
     }

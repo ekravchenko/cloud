@@ -1,5 +1,6 @@
 package com.uawebchallenge.cloud.script;
 
+import com.uawebchallenge.cloud.exception.DataException;
 import com.uawebchallenge.cloud.exception.ScriptException;
 import com.uawebchallenge.cloud.exception.TaskException;
 import com.uawebchallenge.cloud.store.Store;
@@ -19,7 +20,7 @@ public class DefaultScriptRunnerTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void runWithCloudGateway() throws ScriptException, TaskException {
+    public void runWithCloudGateway() throws ScriptException, TaskException, DataException {
         String script = "function main() {var task={input: 5, script: function main(input) {return input + 1;}};" +
                 "cloud.createTask(task);}";
 
@@ -74,19 +75,5 @@ public class DefaultScriptRunnerTest {
         ScriptRunner scriptRunner = new DefaultScriptRunner(store);
         scriptRunner.run(script, "main", 2);
         fail("Script execution should fail!");
-    }
-
-    @Test
-    public void testArrays() throws ScriptException, javax.script.ScriptException, NoSuchMethodException {
-        ScriptRunner scriptRunner = new DefaultScriptRunner(store);
-        store.put("myArray", new int[] {1, 2, 3});
-
-        Optional<Object> myArray = store.get("myArray");
-        Object o = myArray.get();
-        Object array = ((ScriptObjectsTransformer) scriptRunner).fromJava(o);
-
-        final String script = "function main(array) { var myArray=cloud.get('myArray'); log.info(myArray);}";
-        //Object array = ((ScriptObjectsTransformer) scriptRunner).fromJava(new String[]{"1", "2"});
-        scriptRunner.run(script, "main", array);
     }
 }

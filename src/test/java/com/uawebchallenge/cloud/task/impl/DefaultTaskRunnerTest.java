@@ -1,5 +1,6 @@
 package com.uawebchallenge.cloud.task.impl;
 
+import com.uawebchallenge.cloud.exception.DataException;
 import com.uawebchallenge.cloud.exception.ScriptException;
 import com.uawebchallenge.cloud.exception.TaskException;
 import com.uawebchallenge.cloud.store.Store;
@@ -36,7 +37,7 @@ public class DefaultTaskRunnerTest {
     }
 
     @Test
-    public void testRunWithTaskCreation() throws ScriptException, TaskException {
+    public void testRunWithTaskCreation() throws ScriptException, TaskException, DataException {
         final String script = "function main(context) { " +
                 "var task={input:[5,7], script: function main(input) {return input + 4;}, dependsOn: ['2', '3']};" +
                 "print('Context:');" +
@@ -66,7 +67,7 @@ public class DefaultTaskRunnerTest {
     }
 
     @Test
-    public void testRunWithTaskCreationSimpleInput() throws ScriptException, TaskException {
+    public void testRunWithTaskCreationSimpleInput() throws ScriptException, TaskException, DataException {
         final String script = "function main(context) { " +
                 "var task={input:'arrayAddress', script: function main(input) {return input + 4;}, dependsOn: ['2', '3']};" +
                 "cloud.createTask(task);}";

@@ -1,5 +1,6 @@
 package com.uawebchallenge.cloud.worker;
 
+import com.uawebchallenge.cloud.exception.DataException;
 import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.store.StoreEmulator;
 import com.uawebchallenge.cloud.store.StoreKeyConstants;
@@ -25,7 +26,7 @@ public class WorkerTest {
     private Store store = new StoreEmulator();
 
     @Test(timeout = 20000)
-    public void run() throws IOException {
+    public void run() throws IOException, DataException {
         String script = getScript();
 
         Task task = new Task(script);
@@ -68,7 +69,7 @@ public class WorkerTest {
         }.start();
     }
 
-    private void waitForAllTasksToComplete() {
+    private void waitForAllTasksToComplete() throws DataException {
         Optional<Object> tasksOptional = store.get(StoreKeyConstants.TASK_LIST_KEY);
         assertNotNull(tasksOptional);
         assertTrue(tasksOptional.isPresent());
@@ -92,7 +93,7 @@ public class WorkerTest {
         }
     }
 
-    private Task findTask(String taskId) {
+    private Task findTask(String taskId) throws DataException {
         Optional<Object> tasksOptional = store.get(StoreKeyConstants.TASK_LIST_KEY);
         assertNotNull(tasksOptional);
         assertTrue(tasksOptional.isPresent());

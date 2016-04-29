@@ -1,5 +1,6 @@
 package com.uawebchallenge.cloud.script;
 
+import com.uawebchallenge.cloud.exception.DataException;
 import com.uawebchallenge.cloud.exception.ScriptException;
 import com.uawebchallenge.cloud.store.Store;
 
@@ -22,13 +23,13 @@ public class DefaultLibraryBinding implements LibraryBinding {
     }
 
     @Override
-    public void export(String libraryName, Bindings scriptObject) {
+    public void export(String libraryName, Bindings scriptObject) throws DataException {
         String script = scriptObject.toString();
         this.store.put(libraryName, script);
     }
 
     @Override
-    public void require(String libraryName) throws ScriptException {
+    public void require(String libraryName) throws ScriptException, DataException {
         if (!loadedLibs.contains(libraryName)) {
             Optional<Object> scriptOptional = this.store.get(libraryName);
             if (!scriptOptional.isPresent()) {

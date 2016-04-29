@@ -1,5 +1,6 @@
 package com.uawebchallenge.cloud.worker;
 
+import com.uawebchallenge.cloud.exception.DataException;
 import com.uawebchallenge.cloud.exception.ScriptException;
 import com.uawebchallenge.cloud.exception.TaskException;
 import com.uawebchallenge.cloud.store.Store;
@@ -43,7 +44,7 @@ public class Worker {
         }
     }
 
-    private void executeTask(Optional<Task> taskOptional) throws TaskException {
+    private void executeTask(Optional<Task> taskOptional) throws TaskException, DataException {
         if (!taskOptional.isPresent()) {
             logger.debug("No pending task was found. Worker is currently idle.");
             sleepQuietly();
@@ -64,7 +65,6 @@ public class Worker {
                 taskManager.finishTask(taskId, result);
                 workerSleep.reset();
             } catch (ScriptException e) {
-                e.printStackTrace();
                 final String error = e.getMessage();
                 logger.warn(String.format("Error running task '%s'. Error: %s", taskId, error));
                 taskManager.failTask(taskId, error);

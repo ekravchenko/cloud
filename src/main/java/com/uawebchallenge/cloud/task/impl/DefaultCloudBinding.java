@@ -1,5 +1,6 @@
 package com.uawebchallenge.cloud.task.impl;
 
+import com.uawebchallenge.cloud.exception.DataException;
 import com.uawebchallenge.cloud.exception.ScriptException;
 import com.uawebchallenge.cloud.exception.TaskException;
 import com.uawebchallenge.cloud.script.CloudBinding;
@@ -30,7 +31,7 @@ public class DefaultCloudBinding implements CloudBinding {
     }
 
     @Override
-    public String createTask(Bindings object) throws TaskException, ScriptException {
+    public String createTask(Bindings object) throws TaskException, ScriptException, DataException {
         Object input = scriptObjectsTransformer.toJava(object.get(INPUT_KEY));
         Object scriptObject = object.get(SCRIPT_KEY);
         String script = scriptObject != null ? scriptObject.toString() : null;
@@ -43,20 +44,20 @@ public class DefaultCloudBinding implements CloudBinding {
     }
 
     @Override
-    public void put(Object key, Object jsValue) throws ScriptException {
+    public void put(String key, Object jsValue) throws ScriptException, DataException {
         Object value = scriptObjectsTransformer.toJava(jsValue);
         this.store.put(key, value);
     }
 
     @Override
-    public Object get(Object key) throws ScriptException {
+    public Object get(String key) throws ScriptException, DataException {
         Optional<Object> optional = this.store.get(key);
         Object value = optional.isPresent() ? optional.get() : null;
         return scriptObjectsTransformer.fromJava(value);
     }
 
     @Override
-    public String topParentId(String taskId) throws TaskException {
+    public String topParentId(String taskId) throws TaskException, DataException {
         Set<Task> tasks = tasksList.tasks();
 
         String topParentId = null;
