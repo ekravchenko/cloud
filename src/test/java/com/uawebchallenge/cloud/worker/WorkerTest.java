@@ -40,7 +40,8 @@ public class WorkerTest {
         startWorkerInNewThread(worker2);
 
         waitForAllTasksToComplete();
-
+        worker1.stop();
+        worker2.stop();
 
         Task resultTask = findTask(task.getId());
         assertNotNull(resultTask);

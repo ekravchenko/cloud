@@ -27,8 +27,8 @@ public class Worker {
         this.workerSleep = new WorkerSleep();
     }
 
-    public void stop(boolean stop) {
-        this.stop = stop;
+    public void stop() {
+        this.stop = true;
     }
 
     public void work() {

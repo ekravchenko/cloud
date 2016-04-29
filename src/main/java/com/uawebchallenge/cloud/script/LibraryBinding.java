@@ -4,9 +4,9 @@ import com.uawebchallenge.cloud.exception.ScriptException;
 
 import javax.script.Bindings;
 
-public interface LibraryBinding {
+interface LibraryBinding {
 
-    void export(String libraryName, Bindings script) throws ScriptException;
+    void export(String libraryName, Bindings script);
 
     void require(String libraryName) throws ScriptException;
 }

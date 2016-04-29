@@ -255,7 +255,7 @@ public class DefaultTaskManagerTest {
         assertEquals("Something went wrong", updatedTask.getError());
     }
 
-    @Test
+    @Test(expected = TaskException.class)
     public void dependenciesResolvedWhenOneTaskNotFound() throws TaskException {
         final Task task1 = new Task(Optional.empty(), "foo() {}", Optional.empty(), Optional.empty());
         task1.setTaskStatus(TaskStatus.FINISHED);
@@ -278,14 +278,6 @@ public class DefaultTaskManagerTest {
 
         store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
 
-        assertFalse(taskManager.dependenciesResolved(task4));
-
-        Optional<Task> updatedTaskOptional = taskManager.getTask(task4.getId());
-        assertNotNull(updatedTaskOptional);
-        assertTrue(updatedTaskOptional.isPresent());
-
-        Task updatedTask = updatedTaskOptional.get();
-        assertEquals(TaskStatus.ERROR, updatedTask.getTaskStatus());
-        assertEquals("Task depends on task 'FakeId' which couldn't be found.", updatedTask.getError());
+        taskManager.dependenciesResolved(task4);
     }
 }

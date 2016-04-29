@@ -22,7 +22,7 @@ public class DefaultLibraryBinding implements LibraryBinding {
     }
 
     @Override
-    public void export(String libraryName, Bindings scriptObject) throws ScriptException {
+    public void export(String libraryName, Bindings scriptObject) {
         String script = scriptObject.toString();
         this.store.put(libraryName, script);
     }
