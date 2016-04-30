@@ -10,6 +10,7 @@ import com.uawebchallenge.cloud.task.TaskStatus;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -110,7 +111,7 @@ class TasksList {
     private Set<Task> getTasks() throws TaskException {
         try {
             Optional<Object> taskListOptional = this.store.get(StoreKeyConstants.TASK_LIST_KEY);
-            return (Set<Task>) taskListOptional.orElse(new HashSet<>());
+            return (Set<Task>) taskListOptional.orElse(new LinkedHashSet<>());
         } catch (DataException e) {
             throw TaskException.errorGettingTasks(e);
         }

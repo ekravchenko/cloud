@@ -3,7 +3,7 @@ package com.uawebchallenge.cloud.worker;
 public class WorkerSleep {
 
     protected final static int MIN = 500;
-    protected final static int MAX = 30000;
+    protected final static int MAX = 10000;
     private int sleep = MIN;
 
     public void reset() {
