@@ -79,7 +79,7 @@ function oddSort(context) {
 
     var sortTasks = [];
 
-    for (var i = 1; i < bucketAddresses.length; i = i + 2) {
+    for (var i = 1; i < bucketAddresses.length - 1; i = i + 2) {
         var address1 = bucketAddresses[i];
         var address2 = bucketAddresses[i + 1];
 
