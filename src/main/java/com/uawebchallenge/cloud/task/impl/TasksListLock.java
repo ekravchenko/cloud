@@ -14,51 +14,62 @@ import java.util.concurrent.TimeUnit;
 class TasksListLock {
 
     private final static Logger logger = LoggerFactory.getLogger(TasksListLock.class);
-    private final static int SLEEP_MILLIS = 200;
-    final static int MAX_TOTAL_SLEEP = 5000;
+    private final static int SLEEP_MILLIS = 100;
 
     private final Store store;
-    private long totalSleep;
     private final String lockId;
 
     TasksListLock(Store store) {
         this.store = store;
-        this.totalSleep = 0;
         this.lockId = UUID.randomUUID().toString();
-    }
-
-    private void waitForUnlock() throws LockException {
-        if (totalSleep > MAX_TOTAL_SLEEP) {
-            long oldTotalSleep = resetTotalSleep();
-            logger.warn("Waited too long for unlock. TotalSleep=" + oldTotalSleep);
-            throw LockException.lockTimeout(oldTotalSleep);
-        }
-
-        if (isLocked()) {
-            logger.trace("Tasks list is locked");
-            sleep();
-            waitForUnlock();
-        } else {
-            resetTotalSleep();
-            logger.trace("Tasks list is unlocked");
-        }
     }
 
     void lock() throws LockException {
         try {
-            resetTotalSleep();
-            waitForUnlock();
-            this.store.put(StoreKeyConstants.TASK_LIST_LOCK_KEY, this.lockId);
-            waitForUnlock();
+            String currentLock = getLockValue();
+
+            if (StringUtils.isNotEmpty(currentLock) && !lockId.equals(currentLock)) {
+                logger.trace("Tasks list is locked by " + currentLock);
+                sleep();
+                lock();
+            } else {
+                logger.trace("Tasks list is not locked");
+                logger.trace("Trying to lock tasks list. Lock= " + lockId);
+                this.store.put(StoreKeyConstants.TASK_LIST_LOCK_KEY, this.lockId);
+                logger.trace("Checking the lock");
+                doubleCheckLock();
+            }
         } catch (DataException e) {
             throw LockException.errorSettingLock(this.lockId, e);
         }
     }
 
+    private void doubleCheckLock() throws LockException {
+        sleep();
+
+        String currentLock = getLockValue();
+        if (!lockId.equals(currentLock)) {
+            logger.trace("Lock that I've set was broken due to concurrency");
+            logger.trace("Expected lock=" + lockId);
+            logger.trace("Current lock=" + currentLock);
+            logger.trace("Restarting lock process");
+            lock();
+        } else {
+            logger.trace("Lock was successfully set. LockId=" + lockId);
+        }
+    }
+
     void unlock() throws LockException {
         try {
-            resetTotalSleep();
+            logger.trace("Trying to unlock.....");
+            String currentLock = getLockValue();
+            if (!lockId.equals(currentLock)) {
+                logger.warn("Locking is broken. Trying to unlock task list while it was locked by someone else");
+                logger.warn("Expected lock=" + lockId);
+                logger.warn("Current lock=" + currentLock);
+            }
             this.store.put(StoreKeyConstants.TASK_LIST_LOCK_KEY, StringUtils.EMPTY);
+            logger.trace("Unlock was successful....");
         } catch (DataException e) {
             throw LockException.errorGettingLock(e);
         }
@@ -66,24 +77,16 @@ class TasksListLock {
 
     private void sleep() {
         try {
-            this.totalSleep = this.totalSleep + SLEEP_MILLIS;
             TimeUnit.MILLISECONDS.sleep(SLEEP_MILLIS);
         } catch (InterruptedException e) {
             logger.error("Unexpected InterruptedException when freezing thread.", e);
         }
     }
 
-    private long resetTotalSleep() {
-        long oldTotalSleep = this.totalSleep;
-        this.totalSleep = 0;
-        return oldTotalSleep;
-    }
-
-    private Boolean isLocked() throws LockException {
+    private String getLockValue() throws LockException {
         try {
             Optional<Object> lockOptional = this.store.get(StoreKeyConstants.TASK_LIST_LOCK_KEY);
-            String currentLockId = (String) lockOptional.orElse(StringUtils.EMPTY);
-            return StringUtils.isNotBlank(currentLockId) && !this.lockId.equals(currentLockId);
+            return (String) lockOptional.orElse(StringUtils.EMPTY);
         } catch (DataException e) {
             throw LockException.errorGettingLock(e);
         }

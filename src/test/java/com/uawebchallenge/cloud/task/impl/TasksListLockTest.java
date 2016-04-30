@@ -32,7 +32,7 @@ public class TasksListLockTest {
         long endTime = System.currentTimeMillis();
 
         long executionTime = endTime - startTime;
-        int delta = 200;
+        int delta = 300;
 
         assertEquals(waitTime, executionTime, delta);
     }
@@ -56,14 +56,6 @@ public class TasksListLockTest {
         tasksListLock.unlock();
         assertTrue(store.get(StoreKeyConstants.TASK_LIST_LOCK_KEY).isPresent());
         assertEquals(StringUtils.EMPTY, store.get(StoreKeyConstants.TASK_LIST_LOCK_KEY).get());
-    }
-
-    @Test(timeout = TasksListLock.MAX_TOTAL_SLEEP * 2, expected = LockException.class)
-    public void waitForUnlockUnlimited() throws LockException, DataException {
-        store.put(StoreKeyConstants.TASK_LIST_LOCK_KEY, UUID.randomUUID().toString());
-
-        TasksListLock tasksListLock = new TasksListLock(store);
-        tasksListLock.lock();
     }
 
     private void unlockAfter(long millis) {
