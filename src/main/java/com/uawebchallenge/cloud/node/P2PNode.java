@@ -19,7 +19,6 @@ import java.util.Random;
 
 public class P2PNode implements Node {
 
-    private static final Integer DEFAULT_PORT = 4000;
     private final Peer peer;
 
 
@@ -30,8 +29,8 @@ public class P2PNode implements Node {
             Number160 peerId = new Number160(new Random());
             peer = new PeerMaker(peerId).setPorts(port).makeAndListen();
             peer.getConfiguration().setBehindFirewall(true);
-        } catch (IOException e) {
-            throw NodeException.creationError(port, e.getMessage());
+        } catch (Exception e) {
+            throw NodeException.creationError(port, e);
         }
     }
 
@@ -43,8 +42,7 @@ public class P2PNode implements Node {
             futureDiscover.awaitUninterruptibly();
             FutureBootstrap futureBootstrap = peer.bootstrap().setInetAddress(address).setPorts(port).start();
             futureBootstrap.awaitUninterruptibly();
-        }
-        catch (UnknownHostException e) {
+        } catch (UnknownHostException e) {
             throw NodeException.inetAddressError(hostIp);
         }
     }

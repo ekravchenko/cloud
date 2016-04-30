@@ -7,6 +7,8 @@ import java.util.Optional;
 
 public interface Node {
 
+    Integer DEFAULT_PORT = 4000;
+
     void connectViaIp(String hostIp, Integer port) throws NodeException;
 
     void connectViaBroadcast(Integer port);

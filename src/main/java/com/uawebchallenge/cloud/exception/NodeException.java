@@ -6,8 +6,13 @@ public class NodeException extends Exception {
         super(message);
     }
 
-    public static NodeException creationError(int port, String error) {
-        return new NodeException(String.format("Error creating new node on port %d. Details: %s", port, error));
+    private NodeException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public static NodeException creationError(int port, Exception e) {
+        String error = String.format("Error creating new node on port %d. Details: %s", port, e.getMessage());
+        return new NodeException(error, e);
     }
 
     public static NodeException inetAddressError(String ip) {
