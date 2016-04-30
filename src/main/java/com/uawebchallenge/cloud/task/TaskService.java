@@ -1,15 +1,10 @@
 package com.uawebchallenge.cloud.task;
 
-import com.uawebchallenge.cloud.exception.DataException;
 import com.uawebchallenge.cloud.exception.TaskException;
 
 import java.util.Optional;
 
-public interface TaskManager {
-
-    Optional<Task> nextPendingTask() throws TaskException;
-
-    boolean dependenciesResolved(Task task) throws TaskException;
+public interface TaskService {
 
     Optional<Task> getTask(String taskId) throws TaskException;
 

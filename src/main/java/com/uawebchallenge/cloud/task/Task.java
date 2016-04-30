@@ -20,10 +20,6 @@ public class Task implements Serializable {
     private String[] dependsOn;
     private String parentId;
 
-    // TODO REmove result and error.
-    private Object result;
-    private String error;
-
     public Task(Optional<Object> inputOptional, String script, Optional<String[]> dependsOnOptional, Optional<String> parentIdOptional) {
         Validate.notNull(inputOptional, "Provided 'inputOptional' is null");
         Validate.notNull(script, "Provided 'script' is null");
@@ -42,13 +38,5 @@ public class Task implements Serializable {
 
     public void setTaskStatus(TaskStatus taskStatus) {
         this.taskStatus = taskStatus;
-    }
-
-    public void setResult(Object result) {
-        this.result = result;
-    }
-
-    public void setError(String error) {
-        this.error = error;
     }
 }

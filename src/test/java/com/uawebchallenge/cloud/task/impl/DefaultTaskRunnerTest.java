@@ -1,7 +1,6 @@
 package com.uawebchallenge.cloud.task.impl;
 
 import com.uawebchallenge.cloud.exception.DataException;
-import com.uawebchallenge.cloud.exception.ScriptException;
 import com.uawebchallenge.cloud.exception.TaskException;
 import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.store.StoreEmulator;
@@ -11,6 +10,7 @@ import com.uawebchallenge.cloud.task.TaskRunner;
 import com.uawebchallenge.cloud.task.TaskStatus;
 import org.junit.Test;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -23,23 +23,39 @@ public class DefaultTaskRunnerTest {
     private TaskRunner taskRunner = new DefaultTaskRunner(store);
 
     @Test
-    public void testRunWithoutInput() throws ScriptException, TaskException {
-        Task task = new Task("function main(context) { return 2+4;}");
-        Object result = taskRunner.run(task);
-        assertEquals(6, result);
+    public void testRunWithoutInput() throws TaskException, DataException {
+        Task task = new Task("function main(context) { return 'hello world';}");
+
+        Set<Task> tasks = new HashSet<>();
+        tasks.add(task);
+        store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
+
+        taskRunner.run(task);
+
+        Optional<Object> result = store.get(task.getId());
+        assertTrue(result.isPresent());
+        assertEquals("hello world", result.get());
     }
 
     @Test
-    public void testRunWithInput() throws ScriptException, TaskException {
-        Task task = new Task(Optional.of(6), "function main(context) { return context.input-2;}", Optional.empty(), Optional.empty());
-        Object result = taskRunner.run(task);
-        assertEquals(4.0, result);
+    public void testRunWithInput() throws TaskException, DataException {
+        Task task = new Task(Optional.of("hello"), "function main(context) { return context.input + ' world';}", Optional.empty(), Optional.empty());
+
+        Set<Task> tasks = new HashSet<>();
+        tasks.add(task);
+        store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
+
+        taskRunner.run(task);
+
+        Optional<Object> result = store.get(task.getId());
+        assertTrue(result.isPresent());
+        assertEquals("hello world", result.get());
     }
 
     @Test
-    public void testRunWithTaskCreation() throws ScriptException, TaskException, DataException {
+    public void testRunWithTaskCreation() throws TaskException, DataException {
         final String script = "function main(context) { " +
-                "var task={input:[5,7], script: function main(input) {return input + 4;}, dependsOn: ['2', '3']};" +
+                "var task={input:'hello', script: function main(input) {return input + ' world';}, dependsOn: ['2', '3']};" +
                 "print('Context:');" +
                 "print('Input='+context.input);" +
                 "print('TaskId='+context.taskId);" +
@@ -48,44 +64,53 @@ public class DefaultTaskRunnerTest {
                 "for(var i=0; i<context.dependsOn.length; i++) { dependsOn=dependsOn+context.dependsOn[i]+' ';}" +
                 "print('DependsOn='+dependsOn);" +
                 "cloud.createTask(task);}";
-        Task task = new Task(Optional.empty(), script, Optional.of(new String[]{"5", "6"}), Optional.of("9"));
-        Object result = taskRunner.run(task);
-        assertNull(result);
+        Task task = new Task(script);
+        Set<Task> tasks = new HashSet<>();
+        tasks.add(task);
+        store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
+
+        taskRunner.run(task);
 
         Optional<Object> tasksOptional = store.get(StoreKeyConstants.TASK_LIST_KEY);
         assertNotNull(tasksOptional);
         assertTrue(tasksOptional.isPresent());
 
-        Set<Task> tasks = (Set<Task>) tasksOptional.get();
-        assertEquals(1, tasks.size());
+        tasks = (Set<Task>) tasksOptional.get();
+        assertEquals(2, tasks.size());
 
-        Task subTask = tasks.iterator().next();
-        assertEquals("function main(input) {return input + 4;}", subTask.getScript());
-        assertArrayEquals(new Object[]{5, 7}, (Object[]) subTask.getInput());
+        Optional<Task> subTaskOptional = tasks.stream().filter(t -> !t.getId().equals(task.getId())).findFirst();
+        Task subTask = subTaskOptional.get();
+
+        assertEquals("function main(input) {return input + ' world';}", subTask.getScript());
+        assertEquals("hello", subTask.getInput());
         assertArrayEquals(new String[]{"2", "3"}, subTask.getDependsOn());
         assertEquals(TaskStatus.NOT_STARTED, subTask.getTaskStatus());
     }
 
+    @SuppressWarnings("EmptyCatchBlock")
     @Test
-    public void testRunWithTaskCreationSimpleInput() throws ScriptException, TaskException, DataException {
-        final String script = "function main(context) { " +
-                "var task={input:'arrayAddress', script: function main(input) {return input + 4;}, dependsOn: ['2', '3']};" +
-                "cloud.createTask(task);}";
-        Task task = new Task(Optional.empty(), script, Optional.of(new String[]{"5", "6"}), Optional.of("9"));
-        Object result = taskRunner.run(task);
-        assertNull(result);
+    public void testRunWithScriptErrors() throws DataException {
+        Task task = new Task("function main(context) { return notexisting;}");
+
+        Set<Task> tasks = new HashSet<>();
+        tasks.add(task);
+        store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
+
+        try {
+            taskRunner.run(task);
+        } catch (TaskException e) {
+        }
+
+        Optional<Object> result = store.get(task.getId());
+        assertTrue(result.isPresent());
 
         Optional<Object> tasksOptional = store.get(StoreKeyConstants.TASK_LIST_KEY);
-        assertNotNull(tasksOptional);
         assertTrue(tasksOptional.isPresent());
 
-        Set<Task> tasks = (Set<Task>) tasksOptional.get();
+        tasks = (Set<Task>) tasksOptional.get();
         assertEquals(1, tasks.size());
 
-        Task subTask = tasks.iterator().next();
-        assertEquals("function main(input) {return input + 4;}", subTask.getScript());
-        assertEquals("arrayAddress", subTask.getInput());
-        assertArrayEquals(new String[]{"2", "3"}, subTask.getDependsOn());
-        assertEquals(TaskStatus.NOT_STARTED, subTask.getTaskStatus());
+        task = tasks.iterator().next();
+        assertEquals(TaskStatus.ERROR, task.getTaskStatus());
     }
 }

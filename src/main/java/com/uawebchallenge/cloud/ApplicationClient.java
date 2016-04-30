@@ -18,7 +18,7 @@ import java.util.Set;
 public class ApplicationClient {
 
     public static void main(String[] args) throws NodeException, IOException, DataException {
-        Node node = new P2PNode(Optional.of(4001));
+        Node node = new P2PNode(Optional.of(4005));
         node.connectViaIp("127.0.0.1", 4000);
 
         DistributedStore distributedStore = new DistributedStore(node);

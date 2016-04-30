@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public class StoreEmulator implements Store {
 
-    HashMap<Object, Object> map = new HashMap<>();
+    private HashMap<Object, Object> map = new HashMap<>();
 
     public void put(String key, Object value) throws DataException {
         Object clone = SerializationUtils.clone((Serializable) value);

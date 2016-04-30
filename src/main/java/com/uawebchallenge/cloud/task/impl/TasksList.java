@@ -2,12 +2,14 @@ package com.uawebchallenge.cloud.task.impl;
 
 import com.uawebchallenge.cloud.exception.DataException;
 import com.uawebchallenge.cloud.exception.TaskException;
+import com.uawebchallenge.cloud.exception.TaskStatusException;
 import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.store.StoreKeyConstants;
 import com.uawebchallenge.cloud.task.Task;
+import com.uawebchallenge.cloud.task.TaskStatus;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -21,72 +23,71 @@ class TasksList {
         this.tasksListLock = new TasksListLock(store);
     }
 
-    void add(Task task) throws TaskException {
-        Set<Task> tasks = tasks();
-        lock();
-        try {
-            tasks.add(task);
-            this.store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
-        } catch (DataException e) {
-            throw TaskException.errorSettingData(StoreKeyConstants.TASK_LIST_KEY, tasks, e);
-        } finally {
-            unlock();
-        }
+    String create(Task task) throws TaskException {
+        changeTasks(tasks -> tasks.add(task));
+        return task.getId();
+    }
+
+    void updateStatus(String taskId, TaskStatus taskStatus) throws TaskException {
+        changeTasks(tasks -> {
+            Task task = findTask(tasks, taskId);
+            if (taskStatus == task.getTaskStatus()) {
+                throw TaskStatusException.taskStatusAlreadyUpdated(taskId, taskStatus);
+            }
+            task.setTaskStatus(taskStatus);
+        });
+    }
+
+    void saveResult(String taskId, Object result) throws TaskException {
+        changeTasks(tasks -> {
+            try {
+                Task task = findTask(tasks, taskId);
+                task.setTaskStatus(TaskStatus.FINISHED);
+                if (result != null) {
+                    store.put(taskId, result);
+                }
+            } catch (DataException e) {
+                throw TaskException.errorSettingData(taskId, result, e);
+            }
+        });
+    }
+
+    void saveError(String taskId, Object result) throws TaskException {
+        changeTasks(tasks -> {
+            try {
+                Task task = findTask(tasks, taskId);
+
+                while (task != null) {
+                    task.setTaskStatus(TaskStatus.ERROR);
+                    if (result != null) {
+                        store.put(taskId, result);
+                    }
+                    task = findTaskThatDependsOn(tasks, task.getId());
+                }
+            } catch (DataException e) {
+                throw TaskException.errorSettingData(taskId, result, e);
+            }
+        });
     }
 
     Optional<Task> get(String taskId) throws TaskException {
-        Set<Task> tasks = tasks();
-        return tasks.stream().filter(t -> t.getId().equals(taskId)).findFirst();
+        return findInTasks(tasks -> tasks.stream().filter(t -> t.getId().equals(taskId)).findAny());
     }
 
-    Optional<Task> get(Set<Task> tasks, String taskId) {
-        return tasks.stream().filter(t -> t.getId().equals(taskId)).findFirst();
-    }
-
-    void update(String taskId, UpdatableTaskData updatableTaskData) throws TaskException {
-        Set<Task> tasks = tasks();
-        lock();
-        try {
-            Optional<Task> taskOptional = tasks.stream().filter(t -> t.getId().equals(taskId)).findFirst();
-            if (!taskOptional.isPresent()) {
-                throw TaskException.taskNotFound(taskId);
-            }
-            Task task = taskOptional.get();
-
-            if (task.getTaskStatus() == updatableTaskData.getTaskStatus() &&
-                    Objects.equals(task.getResult(), updatableTaskData.getResult()) &&
-                    Objects.equals(task.getError(), updatableTaskData.getError())) {
-                throw TaskException.taskAlreadyUpdated(task.toString(), updatableTaskData.toString());
-            }
-
-            task.setTaskStatus(updatableTaskData.getTaskStatus());
-            task.setResult(updatableTaskData.getResult());
-            task.setError(updatableTaskData.getError());
-
-            if (task.getResult() != null) {
-                this.store.put(task.getId(), task.getResult());
-            }
-            this.store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
-        } catch (DataException e) {
-            throw  TaskException.errorSettingData(StoreKeyConstants.TASK_LIST_KEY, tasks, e);
-        } finally {
-            unlock();
+    private Task findTask(Set<Task> tasks, String taskId) throws TaskException {
+        Optional<Task> taskOptional = tasks.stream().filter(t -> t.getId().equals(taskId)).findAny();
+        if (!taskOptional.isPresent()) {
+            throw TaskException.taskNotFound(taskId);
         }
+        return taskOptional.get();
     }
 
-
-    // TODO I need to make this method private. If someone wants to modify this I should provide LAMDA way
-    @SuppressWarnings("unchecked")
-    Set<Task> tasks() throws TaskException {
-        try {
-            this.tasksListLock.waitForUnlock();
-            Optional<Object> taskListOptional = this.store.get(StoreKeyConstants.TASK_LIST_KEY);
-            return taskListOptional.isPresent() ? (Set<Task>) taskListOptional.get() : new HashSet<>();
-        } catch (LockException e) {
-            throw TaskException.lockTimeout();
-        } catch (DataException e) {
-            throw TaskException.errorGettingData(StoreKeyConstants.TASK_LIST_KEY, e);
-        }
+    private Task findTaskThatDependsOn(Set<Task> tasks, String taskId) {
+        Optional<Task> taskOptional = tasks.stream()
+                .filter(t -> ArrayUtils.contains(t.getDependsOn(), taskId)
+                && t.getTaskStatus() != TaskStatus.ERROR)
+                .findAny();
+        return taskOptional.orElse(null);
     }
 
     private void lock() throws TaskException {
@@ -103,5 +104,52 @@ class TasksList {
         } catch (LockException e) {
             throw TaskException.errorUnlocking(e);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private Set<Task> getTasks() throws TaskException {
+        try {
+            Optional<Object> taskListOptional = this.store.get(StoreKeyConstants.TASK_LIST_KEY);
+            return (Set<Task>) taskListOptional.orElse(new HashSet<>());
+        } catch (DataException e) {
+            throw TaskException.errorGettingTasks(e);
+        }
+    }
+
+    private void saveTasks(Set<Task> tasks) throws TaskException {
+        try {
+            this.store.put(StoreKeyConstants.TASK_LIST_KEY, tasks);
+        } catch (DataException e) {
+            throw TaskException.errorSettingData(StoreKeyConstants.TASK_LIST_KEY, tasks, e);
+        }
+    }
+
+    private void changeTasks(ChangeTasks changeTasks) throws TaskException {
+        lock();
+        try {
+            Set<Task> tasks = getTasks();
+            changeTasks.change(tasks);
+            saveTasks(tasks);
+        } finally {
+            unlock();
+        }
+    }
+
+    <T> T findInTasks(FindInTasks<T> findInTasks) throws TaskException {
+        lock();
+        try {
+            Set<Task> tasks = getTasks();
+            return findInTasks.find(tasks);
+        } finally {
+            unlock();
+        }
+    }
+
+    interface ChangeTasks {
+        void change(Set<Task> tasks) throws TaskException;
+    }
+
+    interface FindInTasks<T> {
+        T find(Set<Task> tasks);
     }
 }

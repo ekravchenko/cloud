@@ -4,7 +4,7 @@
  * @returns {string[]} - Array that should be sorted
  */
 function arrayToSort() {
-    return ["true", "goal", "working", "trouble", "awesome", "fun", "dangerous", "understand", "mine"];
+    return ["true", "goal", "working", "trouble", "awesome", "fun", "dangerous", "understand", "mine", "apple", "optimus"];
 }
 
 /**
@@ -182,7 +182,7 @@ function sortPairs(context) {
     var arrayToSort = array1.concat(array2);
     var arrayToSortCopy = array1.concat(array2);
 
-      log.trace("ArrayToSort: " + printArray(arrayToSort));
+    log.trace("ArrayToSort: " + printArray(arrayToSort));
     log.trace("ArrayToSortCopy: " + printArray(arrayToSortCopy));
 
     arrayToSort.sort();
@@ -252,8 +252,8 @@ function checkSortResult(context, even) {
         }
 
         var topParentId = cloud.topParentId(context.taskId);
-        log.info("Before puttin!");
-        log.info(finalArray);
+        log.info("TopParentId: " + topParentId);
+        log.info("Sorted array: " + finalArray);
         cloud.put(topParentId, finalArray);
     }
     else if (even) {

@@ -16,7 +16,7 @@ import java.util.Set;
 public class DefaultCloudBinding implements CloudBinding {
 
     private final static String INPUT_KEY = "input";
-    protected final static String SCRIPT_KEY = "script";
+    final static String SCRIPT_KEY = "script";
     private final static String DEPENDS_ON_KEY = "dependsOn";
     private final static String PARENT_ID_KEY = "parentId";
 
@@ -40,10 +40,9 @@ public class DefaultCloudBinding implements CloudBinding {
             String parentId = (String) object.get(PARENT_ID_KEY);
 
             Task task = new Task(Optional.ofNullable(input), script, Optional.ofNullable(dependsOn), Optional.ofNullable(parentId));
-            tasksList.add(task);
+            tasksList.create(task);
             return task.getId();
-        }
-        catch(TaskException e) {
+        } catch (TaskException e) {
             throw ScriptException.errorAddingNewTask(e);
         }
     }
@@ -70,21 +69,27 @@ public class DefaultCloudBinding implements CloudBinding {
     }
 
     @Override
-    public String topParentId(String taskId) throws ScriptException {
+    public String topParentId(final String taskId) throws ScriptException {
         try {
-            Set<Task> tasks = tasksList.tasks();
-
-            String topParentId = null;
-            while (taskId != null) {
-                Optional<Task> taskOptional = tasksList.get(tasks, taskId);
-                taskId = taskOptional.isPresent() ? taskOptional.get().getParentId() : null;
-                topParentId = (taskId != null) ? taskId : topParentId;
-            }
-
-            return topParentId;
+            return tasksList.findInTasks(tasks -> findTopParentId(tasks, taskId));
         } catch (TaskException e1) {
             throw new ScriptException("Error getting list of tasks.", e1);
         }
+    }
+
+    private String findTopParentId(Set<Task> tasks, String taskId) {
+        String topParentId = null;
+        while (taskId != null) {
+            Optional<Task> taskOptional = findTask(tasks, taskId);
+            taskId = taskOptional.isPresent() ? taskOptional.get().getParentId() : null;
+            topParentId = (taskId != null) ? taskId : topParentId;
+        }
+
+        return topParentId;
+    }
+
+    private Optional<Task> findTask(Set<Task> tasks, String taskId) {
+        return tasks.stream().filter(t -> t.getId().equals(taskId)).findAny();
     }
 
     private String[] getDependsOn(Object jsObject) throws ScriptException {

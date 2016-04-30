@@ -3,36 +3,38 @@ package com.uawebchallenge.cloud.task.impl;
 import com.uawebchallenge.cloud.exception.DataException;
 import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.store.StoreKeyConstants;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
-// TODO Need to fix this. I need to link a LOCK to a WOrker not just a boolean flag
 class TasksListLock {
 
     private final static Logger logger = LoggerFactory.getLogger(TasksListLock.class);
-    private final static int SLEEP_MILLIS = 100;
-    final static int MAX_TOTAL_SLEEP = 1500;
+    private final static int SLEEP_MILLIS = 200;
+    final static int MAX_TOTAL_SLEEP = 5000;
 
     private final Store store;
     private long totalSleep;
+    private final String lockId;
 
     TasksListLock(Store store) {
         this.store = store;
         this.totalSleep = 0;
+        this.lockId = UUID.randomUUID().toString();
     }
 
-    void waitForUnlock() throws LockException {
+    private void waitForUnlock() throws LockException {
         if (totalSleep > MAX_TOTAL_SLEEP) {
             long oldTotalSleep = resetTotalSleep();
             logger.warn("Waited too long for unlock. TotalSleep=" + oldTotalSleep);
             throw LockException.lockTimeout(oldTotalSleep);
         }
 
-        Boolean lock = getLock();
-
-        if (lock) {
+        if (isLocked()) {
             logger.trace("Tasks list is locked");
             sleep();
             waitForUnlock();
@@ -44,24 +46,28 @@ class TasksListLock {
 
     void lock() throws LockException {
         try {
-            this.store.put(StoreKeyConstants.TASK_LIST_LOCK_KEY, Boolean.TRUE);
+            resetTotalSleep();
+            waitForUnlock();
+            this.store.put(StoreKeyConstants.TASK_LIST_LOCK_KEY, this.lockId);
+            waitForUnlock();
         } catch (DataException e) {
-            throw LockException.errorSettingData(StoreKeyConstants.TASK_LIST_LOCK_KEY, Boolean.TRUE, e);
+            throw LockException.errorSettingLock(this.lockId, e);
         }
     }
 
     void unlock() throws LockException {
         try {
-            this.store.put(StoreKeyConstants.TASK_LIST_LOCK_KEY, Boolean.FALSE);
+            resetTotalSleep();
+            this.store.put(StoreKeyConstants.TASK_LIST_LOCK_KEY, StringUtils.EMPTY);
         } catch (DataException e) {
-            throw LockException.errorSettingData(StoreKeyConstants.TASK_LIST_LOCK_KEY, Boolean.FALSE, e);
+            throw LockException.errorGettingLock(e);
         }
     }
 
     private void sleep() {
         try {
             this.totalSleep = this.totalSleep + SLEEP_MILLIS;
-            Thread.sleep(SLEEP_MILLIS);
+            TimeUnit.MILLISECONDS.sleep(SLEEP_MILLIS);
         } catch (InterruptedException e) {
             logger.error("Unexpected InterruptedException when freezing thread.", e);
         }
@@ -73,12 +79,13 @@ class TasksListLock {
         return oldTotalSleep;
     }
 
-    private Boolean getLock() throws LockException {
+    private Boolean isLocked() throws LockException {
         try {
             Optional<Object> lockOptional = this.store.get(StoreKeyConstants.TASK_LIST_LOCK_KEY);
-            return (Boolean) lockOptional.orElse(Boolean.FALSE);
+            String currentLockId = (String) lockOptional.orElse(StringUtils.EMPTY);
+            return StringUtils.isNotBlank(currentLockId) && !this.lockId.equals(currentLockId);
         } catch (DataException e) {
-            throw LockException.errorGettingData(StoreKeyConstants.TASK_LIST_LOCK_KEY, e);
+            throw LockException.errorGettingLock(e);
         }
     }
 }

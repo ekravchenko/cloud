@@ -4,5 +4,5 @@ import com.uawebchallenge.cloud.exception.TaskException;
 
 public interface TaskRunner {
 
-    Object run(Task task) throws TaskException;
+    void run(Task task) throws TaskException;
 }

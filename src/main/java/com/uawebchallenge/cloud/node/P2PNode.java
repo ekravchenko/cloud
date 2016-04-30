@@ -19,7 +19,7 @@ import java.util.Random;
 
 public class P2PNode implements Node {
 
-    public static final Integer DEFAULT_PORT = 4000;
+    private static final Integer DEFAULT_PORT = 4000;
     private final Peer peer;
 
 

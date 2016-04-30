@@ -9,11 +9,11 @@
         </layout>
     </appender>
 
-    <logger name="com.uawebchallenge.cloud" level="debug" additivity="false">
+    <logger name="com.uawebchallenge.cloud" level="info" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="script" level="info" additivity="false">
+    <logger name="script" level="trace" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 

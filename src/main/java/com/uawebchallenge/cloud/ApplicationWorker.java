@@ -13,7 +13,8 @@ import java.util.Optional;
 public class ApplicationWorker {
 
     public static void main(String[] args) throws DataException, NodeException {
-        Node node = new P2PNode(Optional.of(4000));
+        Node node = new P2PNode(Optional.of(4001));
+        node.connectViaIp("localhost", 4000);
 
         DistributedStore distributedStore = new DistributedStore(node);
 
