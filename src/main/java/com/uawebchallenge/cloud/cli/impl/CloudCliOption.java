@@ -12,8 +12,8 @@ public enum CloudCliOption {
     TASK("t", "task"),
     SCHEDULE("s", "schedule"),
     FILE("f", "file"),
-    OUTPUT("o", "output");
-
+    OUTPUT("o", "output"),
+    DEBUG("d", "debug");
 
     private String code;
     private String longCode;

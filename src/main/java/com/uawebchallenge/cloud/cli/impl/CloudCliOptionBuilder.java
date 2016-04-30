@@ -42,12 +42,17 @@ class CloudCliOptionBuilder {
                 .hasArg(true)
                 .optionalArg(false)
                 .build();
+        Option debug = Option.builder(CloudCliOption.DEBUG.getCode())
+                .longOpt(CloudCliOption.DEBUG.getLongCode())
+                .hasArg(false)
+                .build();
         options.addOption(worker);
         options.addOption(task);
         options.addOption(input);
         options.addOption(file);
         options.addOption(schedule);
         options.addOption(output);
+        options.addOption(debug);
         return options;
     }
 }

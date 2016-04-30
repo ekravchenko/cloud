@@ -16,4 +16,6 @@ public interface CloudCliService {
     void setInput(KnownNode knownNode, String key, String fileName) throws CloudCliException;
 
     void getResult(KnownNode knownNode, String key, String fileName) throws CloudCliException;
+
+    void debug(KnownNode knownNode) throws CloudCliException;
 }

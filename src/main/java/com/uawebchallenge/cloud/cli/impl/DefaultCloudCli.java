@@ -79,6 +79,11 @@ public class DefaultCloudCli implements CloudCli {
         } else if (cmd.hasOption(CloudCliOption.OUTPUT.getCode())
                 && !cmd.hasOption(CloudCliOption.FILE.getCode())) {
             // TODO throw Exception
+        } else if(cmd.hasOption(CloudCliOption.DEBUG.getCode())) {
+            if (!knownNode.isPresent()) {
+                throw CloudCliException.knownNodeNotProvided();
+            }
+            cloudCliService.debug(knownNode.get());
         }
     }
 

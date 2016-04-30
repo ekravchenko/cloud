@@ -8,6 +8,7 @@ import com.uawebchallenge.cloud.node.Node;
 import com.uawebchallenge.cloud.node.P2PNode;
 import com.uawebchallenge.cloud.store.DistributedStore;
 import com.uawebchallenge.cloud.store.Store;
+import com.uawebchallenge.cloud.store.StoreKeyConstants;
 import com.uawebchallenge.cloud.task.Task;
 import com.uawebchallenge.cloud.task.TaskService;
 import com.uawebchallenge.cloud.task.TaskStatus;
@@ -15,14 +16,19 @@ import com.uawebchallenge.cloud.task.impl.DefaultTaskService;
 import com.uawebchallenge.cloud.worker.Worker;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 public class DefaultCloudCliService implements CloudCliService {
+
+    private Logger logger = LoggerFactory.getLogger(CloudCliService.class);
 
     public void work(Optional<KnownNode> nodeOptional, Optional<Integer> myPort) throws CloudCliException {
         Node myNode = createAndConnectNode(myPort, nodeOptional);
@@ -98,7 +104,36 @@ public class DefaultCloudCliService implements CloudCliService {
         }
     }
 
+    @Override
+    public void debug(KnownNode knownNode) throws CloudCliException {
+        Node myNode = createAndConnectNode(Optional.of(randomPort()), Optional.of(knownNode));
+
+        Store store = new DistributedStore(myNode);
+        try {
+            Optional<Object> tasksOptional = store.get(StoreKeyConstants.TASK_LIST_KEY);
+            Set<Task> tasks = (Set<Task>) tasksOptional.get();
+            logger.info("----------------------------------------------------");
+            for (Task task : tasks) {
+                logger.info("Task ID:" + task.getId());
+                logger.info("Task get status:" + task.getTaskStatus());
+                logger.info("Task parent ID:" + task.getParentId());
+                logger.info("Task depends on:" + Arrays.toString(task.getDependsOn()));
+
+                Optional<Object> result = store.get(task.getId());
+                logger.info("Task result:" + result.orElse(null));
+                logger.info("Task script:");
+                logger.info(task.getScript());
+            }
+            logger.info("----------------------------------------------------");
+        } catch (DataException e) {
+            throw new CloudCliException(e.getMessage());
+        } finally {
+            myNode.shutdown();
+        }
+    }
+
     private Integer randomPort() {
+        // TODO REturn random port please!
         return 4005;
     }
 
