@@ -9,7 +9,6 @@ import com.uawebchallenge.cloud.task.Task;
 import com.uawebchallenge.cloud.task.TaskStatus;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;

@@ -16,7 +16,7 @@ import java.util.Optional;
 public class DefaultCloudCli implements CloudCli {
 
     private final CloudCliService cloudCliService;
-    private Logger logger = LoggerFactory.getLogger(DefaultCloudCli.class);
+    private final Logger logger = LoggerFactory.getLogger(DefaultCloudCli.class);
 
     public DefaultCloudCli(CloudCliService cloudCliService) {
         this.cloudCliService = cloudCliService;
