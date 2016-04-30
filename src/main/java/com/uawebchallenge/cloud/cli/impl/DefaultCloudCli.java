@@ -30,7 +30,7 @@ public class DefaultCloudCli implements CloudCli {
         try {
             Optional<KnownNode> knownNode = getNode(args);
             CommandLine cmd = parser.parse(options, args);
-            run(knownNode, cmd);
+            run(knownNode, cmd, options);
         } catch (ParseException e) {
             logger.error("Error parsing command", e);
         } catch (CloudCliException e) {
@@ -38,7 +38,7 @@ public class DefaultCloudCli implements CloudCli {
         }
     }
 
-    private void run(Optional<KnownNode> knownNode, CommandLine cmd) throws CloudCliException {
+    private void run(Optional<KnownNode> knownNode, CommandLine cmd, Options options) throws CloudCliException {
         if (cmd.hasOption(CloudCliOption.WORKER.getCode())) {
             String myPortString = cmd.getOptionValue(CloudCliOption.WORKER.getCode());
             Integer myPort = NumberUtils.createInteger(myPortString);
@@ -49,14 +49,14 @@ public class DefaultCloudCli implements CloudCli {
                 throw CloudCliException.knownNodeNotProvided();
             }
             String taskId = cloudCliService.createTask(knownNode.get(), fileName);
-            logger.info("Task was created. Task ID: " + taskId);
+            logger.info("Task was successfully created. Task ID:");
+            logger.info(taskId);
         } else if (cmd.hasOption(CloudCliOption.SCHEDULE.getCode())) {
             String taskId = cmd.getOptionValue(CloudCliOption.SCHEDULE.getCode());
             if (!knownNode.isPresent()) {
                 throw CloudCliException.knownNodeNotProvided();
             }
             cloudCliService.scheduleTask(knownNode.get(), taskId);
-            // TODO Proper logging
         } else if (cmd.hasOption(CloudCliOption.INPUT.getCode())
                 && cmd.hasOption(CloudCliOption.FILE.getCode())) {
             if (!knownNode.isPresent()) {
@@ -65,9 +65,6 @@ public class DefaultCloudCli implements CloudCli {
             String key = cmd.getOptionValue(CloudCliOption.INPUT.getCode());
             String file = cmd.getOptionValue(CloudCliOption.FILE.getCode());
             cloudCliService.setInput(knownNode.get(), key, file);
-        } else if (cmd.hasOption(CloudCliOption.INPUT.getCode()) &&
-                !cmd.hasOption(CloudCliOption.FILE.getCode())) {
-            // TODO Throw exception
         } else if (cmd.hasOption(CloudCliOption.FILE.getCode())
                 && cmd.hasOption(CloudCliOption.OUTPUT.getCode())) {
             if (!knownNode.isPresent()) {
@@ -76,14 +73,14 @@ public class DefaultCloudCli implements CloudCli {
             String fileName = cmd.getOptionValue(CloudCliOption.FILE.getCode());
             String key = cmd.getOptionValue(CloudCliOption.OUTPUT.getCode());
             cloudCliService.getResult(knownNode.get(), key, fileName);
-        } else if (cmd.hasOption(CloudCliOption.OUTPUT.getCode())
-                && !cmd.hasOption(CloudCliOption.FILE.getCode())) {
-            // TODO throw Exception
-        } else if(cmd.hasOption(CloudCliOption.DEBUG.getCode())) {
+        } else if (cmd.hasOption(CloudCliOption.DEBUG.getCode())) {
             if (!knownNode.isPresent()) {
                 throw CloudCliException.knownNodeNotProvided();
             }
             cloudCliService.debug(knownNode.get());
+        } else {
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("cloud", options);
         }
     }
 
