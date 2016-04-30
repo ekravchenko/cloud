@@ -136,7 +136,7 @@ public class DefaultTaskServiceTest {
 
     @Test
     public void add() throws TaskException, DataException {
-        taskService.addTask(Optional.empty(), "foo() {}", Optional.empty(), Optional.empty());
+        taskService.addTask(new Task("foo() {}"));
 
         Optional<Object> tasksOptional = store.get(StoreKeyConstants.TASK_LIST_KEY);
         assertNotNull(tasksOptional);

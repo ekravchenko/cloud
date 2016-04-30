@@ -37,8 +37,7 @@ public class DefaultTaskService implements TaskService {
         tasksList.saveError(taskId, error);
     }
 
-    public String addTask(Optional<Object> input, String script, Optional<String[]> dependsOn, Optional<String> parentId) throws TaskException {
-        Task task = new Task(input, script, dependsOn, parentId);
+    public String addTask(Task task) throws TaskException {
         tasksList.create(task);
         return task.getId();
     }

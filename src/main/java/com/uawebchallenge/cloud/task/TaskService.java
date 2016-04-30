@@ -16,5 +16,5 @@ public interface TaskService {
 
     void failTask(String taskId, String error) throws TaskException;
 
-    String addTask(Optional<Object> input, String script, Optional<String[]> dependsOn, Optional<String> parentId) throws TaskException;
+    String addTask(Task task) throws TaskException;
 }
