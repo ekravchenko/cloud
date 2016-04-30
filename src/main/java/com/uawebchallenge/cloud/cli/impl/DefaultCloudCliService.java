@@ -15,6 +15,7 @@ import com.uawebchallenge.cloud.task.TaskStatus;
 import com.uawebchallenge.cloud.task.impl.DefaultTaskService;
 import com.uawebchallenge.cloud.worker.Worker;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,8 +113,9 @@ public class DefaultCloudCliService implements CloudCliService {
         try {
             Optional<Object> tasksOptional = store.get(StoreKeyConstants.TASK_LIST_KEY);
             Set<Task> tasks = (Set<Task>) tasksOptional.get();
-            logger.info("----------------------------------------------------");
+
             for (Task task : tasks) {
+                logger.info("----------------------------------------------------");
                 logger.info("Task ID:" + task.getId());
                 logger.info("Task get status:" + task.getTaskStatus());
                 logger.info("Task parent ID:" + task.getParentId());
@@ -123,8 +125,8 @@ public class DefaultCloudCliService implements CloudCliService {
                 logger.info("Task result:" + result.orElse(null));
                 logger.info("Task script:");
                 logger.info(task.getScript());
+                logger.info("----------------------------------------------------");
             }
-            logger.info("----------------------------------------------------");
         } catch (DataException e) {
             throw new CloudCliException(e.getMessage());
         } finally {
@@ -133,8 +135,7 @@ public class DefaultCloudCliService implements CloudCliService {
     }
 
     private Integer randomPort() {
-        // TODO REturn random port please!
-        return 4005;
+        return RandomUtils.nextInt(4000, 5000);
     }
 
     private Node createAndConnectNode(Optional<Integer> port, Optional<KnownNode> knownNodeOptional) throws CloudCliException {
