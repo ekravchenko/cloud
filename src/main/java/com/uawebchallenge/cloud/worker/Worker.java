@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 public class Worker {
 
@@ -43,7 +44,7 @@ public class Worker {
 
     private void executeTask(Optional<Task> taskOptional) throws TaskException {
         if (!taskOptional.isPresent()) {
-            logger.debug("No pending task was found. Worker is currently idle.");
+            logger.info("No pending task was found. Worker is currently idle.");
             sleepQuietly();
             workerSleep.increase();
         } else {
@@ -56,7 +57,7 @@ public class Worker {
     private void sleepQuietly() {
         try {
             logger.trace(String.format("I'll wait for %d milliseconds.", workerSleep.getSleep()));
-            Thread.sleep(workerSleep.getSleep());
+            TimeUnit.MILLISECONDS.sleep(workerSleep.getSleep());
             workerSleep.increase();
         } catch (InterruptedException e) {
             logger.error("Unexpected InterruptedException when freezing thread.", e);

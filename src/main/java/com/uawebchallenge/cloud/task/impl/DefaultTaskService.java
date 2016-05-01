@@ -11,7 +11,6 @@ import java.util.Optional;
 public class DefaultTaskService implements TaskService {
 
     private final TasksList tasksList;
-    //private final Logger logger = LoggerFactory.getLogger(DefaultTaskService.class);
 
     public DefaultTaskService(Store store) {
         this.tasksList = new TasksList(store);

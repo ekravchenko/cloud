@@ -5,6 +5,7 @@ import com.uawebchallenge.cloud.store.Store;
 import com.uawebchallenge.cloud.task.impl.DefaultCloudBinding;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import jdk.nashorn.internal.runtime.ScriptObject;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.script.Invocable;
@@ -16,6 +17,7 @@ public class DefaultScriptRunner implements ScriptRunner, ScriptObjectsTransform
     private static final String LIBRARY_KEY = "library";
     private static final String CLOUD_KEY = "cloud";
     private static final String LOGGER_KEY = "log";
+    private static final Logger logger = LoggerFactory.getLogger(DefaultScriptRunner.class);
 
     private final ScriptEngine engine;
 
@@ -33,6 +35,9 @@ public class DefaultScriptRunner implements ScriptRunner, ScriptObjectsTransform
     }
 
     public Object run(String script, String method, Object... args) throws ScriptException {
+        logger.debug("Running script:");
+        logger.debug(script);
+
         Object result = runInternal(script, method, args);
         return toJava(result);
     }

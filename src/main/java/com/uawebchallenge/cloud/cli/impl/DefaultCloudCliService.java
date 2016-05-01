@@ -34,6 +34,8 @@ public class DefaultCloudCliService implements CloudCliService {
     public void work(Optional<KnownNode> nodeOptional, Optional<Integer> myPort) throws CloudCliException {
         Node myNode = createAndConnectNode(myPort, nodeOptional);
         Store store = new DistributedStore(myNode);
+
+        logger.info("Starting up a worker");
         Worker worker = new Worker(store);
         worker.work();
     }
@@ -147,9 +149,11 @@ public class DefaultCloudCliService implements CloudCliService {
 
     private Node createAndConnectNode(Optional<Integer> port, Optional<KnownNode> knownNodeOptional) throws CloudCliException {
         try {
+            logger.info("Starting up node on port " + port.orElse(Node.DEFAULT_PORT));
             Node node = new P2PNode(port);
             if (knownNodeOptional.isPresent()) {
                 KnownNode knownNode = knownNodeOptional.get();
+                logger.info(String.format("Connecting to a known node %s:%d", knownNode.getHostIP(), knownNode.getPort()));
                 node.connectViaIp(knownNode.getHostIP(), knownNode.getPort());
             }
             return node;

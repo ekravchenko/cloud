@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 class TasksListLock {
 
     private final static Logger logger = LoggerFactory.getLogger(TasksListLock.class);
-    private final static int SLEEP_MILLIS = 100;
+    private final static int SLEEP_MILLIS = 50;
 
     private final Store store;
     private final String lockId;

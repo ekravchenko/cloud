@@ -23,16 +23,17 @@ public class DefaultTaskLookup implements TaskLookup {
 
     public Optional<Task> nextPendingTask() throws TaskException {
         return this.tasksList.findInTasks(tasks -> {
-            // First find any task that is not started and has no dependencies
+            logger.trace("Trying to find task that is not started and has no dependencies");
             Optional<Task> taskWithNoDependencies = tasks.stream().parallel()
                     .filter(t -> t.getTaskStatus().equals(TaskStatus.NOT_STARTED) && ArrayUtils.getLength(t.getDependsOn()) == 0)
                     .findAny();
             if (taskWithNoDependencies.isPresent()) {
                 return taskWithNoDependencies;
             }
-            // Otherwise try to find any task and analyze its dependencies
+            logger.trace("Trying to find task with dependencies and those dependencies are resolved");
             return tasks.stream().parallel()
-                    .filter(t -> t.getTaskStatus().equals(TaskStatus.NOT_STARTED) && dependenciesResolved(tasks, t)).findAny();
+                    .filter(t -> t.getTaskStatus().equals(TaskStatus.NOT_STARTED) && dependenciesResolved(tasks, t))
+                    .findAny();
         });
     }
 
