@@ -28,9 +28,14 @@ public class DefaultCloudCli implements CloudCli {
 
         CommandLineParser parser = new DefaultParser();
         try {
-            Optional<KnownNode> knownNode = getNode(args);
-            CommandLine cmd = parser.parse(options, args);
-            run(knownNode, cmd, options);
+            if (args.length > 0) {
+                Optional<KnownNode> knownNode = getNode(args);
+                CommandLine cmd = parser.parse(options, args);
+                run(knownNode, cmd);
+            } else {
+                HelpFormatter formatter = new HelpFormatter();
+                formatter.printHelp("cloud", options);
+            }
         } catch (ParseException e) {
             logger.error("Error parsing command", e);
         } catch (CloudCliException e) {
@@ -38,7 +43,7 @@ public class DefaultCloudCli implements CloudCli {
         }
     }
 
-    private void run(Optional<KnownNode> knownNode, CommandLine cmd, Options options) throws CloudCliException {
+    private void run(Optional<KnownNode> knownNode, CommandLine cmd) throws CloudCliException {
         if (cmd.hasOption(CloudCliOption.WORKER.getCode())) {
             String myPortString = cmd.getOptionValue(CloudCliOption.WORKER.getCode());
             Integer myPort = NumberUtils.createInteger(myPortString);
@@ -78,9 +83,6 @@ public class DefaultCloudCli implements CloudCli {
                 throw CloudCliException.knownNodeNotProvided();
             }
             cloudCliService.debug(knownNode.get());
-        } else {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("cloud", options);
         }
     }
 
